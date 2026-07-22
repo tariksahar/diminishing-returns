@@ -51,9 +51,23 @@ Rationale, in short:
    we only use the tvSeries rows). Deferred; only do it if the endYear proxy
    proves insufficient.
 
-4. **Shows with missing `genres` — edge case.**
-   Series with empty genres currently pass all exclusion rules by default.
-   Check the count in build and decide whether to keep or drop them.
+4. **Shows with missing `genres` — RESOLVED.**
+   Verified in phase0_final_filter_check.py: 0 shows in the final set have
+   missing genres, so this edge case does not occur. No action needed.
+
+5. **Very-long-running shows kept, handled at analysis stage.**
+   Extreme outliers (Pokémon 1234 ep / 25 seasons, Detective Conan 1211 / 54,
+   The Simpsons 806 / 37, etc.) stay in the dataset. Decision: do NOT cap in
+   build. Instead, in Phase 2, normalize trajectories (scale episode order to
+   0-1) and use outlier-robust methods; optionally analyze very-long shows as a
+   separate group. 485 shows have >100 episodes, 127 have >200.
+
+6. **Non-narrative formats leaking through the genre filter — deferred.**
+   Some sketch/variety/web-review shows tagged only as Comedy/Music (not
+   Talk-Show/Reality-TV) survive the genre exclusions — notably Saturday Night
+   Live (1010 ep) and The Nostalgia Critic (935 ep). No clean automatic rule
+   catches these. Deferred: in Phase 2, after eyeballing the data (e.g. very
+   high episode count + variety pattern), consider a small manual blacklist.
 
 ## Language convention
 
