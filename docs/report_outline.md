@@ -1,0 +1,140 @@
+# Report Outline — "Do TV Shows Really Decline?"
+
+Working skeleton for the final write-up. This is a plan, not the prose: it
+places each Phase 2 finding into a section with its reliability tier. Full
+technical rationale for every point lives in `docs/decisions.md`; this file
+is the narrative structure.
+
+Reliability tiers (from the Phase 2 review):
+- 🟢 rock-solid: survived confound controls / artifact checks
+- 🟡 real but conditional: state with an explicit caveat
+- 🔵 methodological: belongs in the "how we know this is trustworthy" section
+
+Language: English (decided). **Deliverables: TWO** — (1) this engaging essay
+(`report_draft.md`), the public-facing hook; (2) a formal technical report
+(abstract / data & methods / results / figures / references), arXiv-style, to
+demonstrate rigor. The analysis is complete, so the technical report is mostly
+a re-formatting of the same findings + `decisions.md`. This outline drives the
+essay; the technical report will reuse the same sections in academic form.
+
+---
+
+## Thesis (the spine)
+
+**Mostly no.** The average show is remarkably stable across its run. The
+"decline" belief is fed by (a) a memorable minority of famous final-season
+collapses and (b) specific subsets — long-running shows, older shows, a few
+genres. And where the belief most expects a collapse (the finale), shows
+usually *peak* instead.
+
+One-line version: *"A few famous shows falling apart doesn't mean every show
+declines."*
+
+---
+
+## 1. Hook — the folk belief
+- Open on the shows everyone remembers collapsing (Game of Thrones S8,
+  Dexter, The Walking Dead). State the question the project tests.
+- NOTE: deliberately avoid House of Cards as a headline example. Its crash
+  is real in the data (-4.24) but was caused by the lead actor being written
+  out amid scandal, so it illustrates an off-screen shock rather than a show
+  losing its way. It belongs in §8 (limitations), not the hook.
+
+## 2. Headline — shows are mostly stable  [🟢]
+- Clean regression-to-the-mean test: a show's second half lands within ~0.07
+  rating points of its first half even at the extremes; the two halves
+  correlate +0.79. Quality persists. (finding #1)
+- Overall decline/rise split across all 3,234 shows (sqrt-votes slope):
+  only 42.6% trend down vs 57.4% up; clear decline (≤ -0.5 start→end) just
+  16.9%, roughly flat (±0.5) 57.4%, clear rise (≥ +0.5) 25.7%; median slope
+  +0.109 (slightly positive). Fewer than 1 in 6 shows clearly declines.
+  (Cross-checked: fresh recompute matched the prior slopes file to 0.000000,
+  retroactively validating every analysis that used it.)
+
+## 3. The finale surprise  [🟢]
+- Season finales are typically a show's *peak*: 72.6% beat their own season
+  (avg +0.25); premieres are unremarkable. (finding #2)
+- Series finales usually rise too (71.6% up); the "finale flop" is the
+  memorable exception (~9% drop hard). (finding #3)
+- Named examples both directions (flops: Dexter, HIMYM, Power; saves: The
+  Office, Brooklyn 99, TNG).
+
+## 4. The "final season curse" — mostly a myth  [🟢 + 🟡 caveat]
+- Ended shows split 50.6% down / 49.4% up, median ≈ 0; only 12.6% a clear
+  curse. Robust to threshold sweep and effect-size. (finding #4)
+- The cursed minority is dominated by very famous shows (GoT -2.55, Master
+  of None -2.54, The Promised Neverland -2.28). House of Cards is the single
+  largest drop (-4.24) but is held back for §8 — see the note in §1.
+- 🟡 Interpretation (hedge explicitly — "a likely explanation, not something
+  the data proves"): availability bias — a few loud collapses make the curse
+  feel universal.
+
+## 5. Where decline IS real — age, length, genre  [🟢]
+- Older and longer shows genuinely decline; newer and shorter ones rise.
+  Both effects hold up net of each other (era +0.0048/yr, length
+  -0.026/season, both highly significant). (finding #7)
+- Genre net of era+length: Animation genuinely up (+0.23), Documentary /
+  Biography down; mainstream Drama/Comedy/Crime/Action ~neutral. Genre
+  matters less than a show's age and length. (finding #8)
+
+## 6. Trajectory shapes  [🟢]
+- "Jumped the shark" (rise-then-fall, peak mid-run) is the single most common
+  shape (44.6%). (finding #9)
+- The peak sits mid-run and scales with show length (NOT "season 2", which
+  was a short-show aggregation artifact); highly variable, slight first-third
+  lean. "The first season is always best" is false — the last season is the
+  single best more often (37% vs 27%). (findings #5, #6)
+- (The ∪ "found itself" shape is handled in the methodology section as an
+  artifact worked-example — see §7.)
+
+## 7. How we made sure this is trustworthy — methodology & reliability  [🔵]
+The credibility section. Not "what we found" but "why you can trust it."
+- **Data & inclusion.** Three IMDb tables joined to one row per rated
+  episode; six inclusion filters (≥13 episodes, ≥2 seasons, ≥50 mean
+  votes/episode, genre exclusions, documentary cap). 3,234 shows / 192,720
+  episodes.
+- **Weighting.** Episodes weighted by sqrt(num_votes) — dampens low-vote
+  noise without letting a single viral episode dominate. Why not raw votes
+  (finale/backlash spikes) or log (≈ unweighted).
+- **Traps we caught and defused (the heart of this section):**
+  - Mathematical coupling: the naive "high shows decline" correlation (-0.37)
+    was inflated by correlating a slope with its own intercept; the clean
+    disjoint-halves test showed the real effect is tiny (~0.07).
+  - Confounding: era / length / ongoing are tangled; used OLS controls to
+    show era and length each hold up independently.
+  - Low-vote tails: the ∪ "found itself" pattern looked real, but ~20% of it
+    is propped up by low-vote late episodes (worked example of an artifact
+    check; ~57% survives, e.g. Star Trek: Picard).
+  - Right metric for the right question: the overall slope understates late
+    sharp crashes (GoT), so the final-season question needs a direct
+    season-mean comparison, not the slope. Slope vs final-season-delta
+    correlate +0.80 — related but not interchangeable.
+  - Late episodes are systematically low-vote (within-show position vs votes
+    correlates -0.74), so any late-leaning analysis is treated as more
+    fragile.
+
+## 8. Limitations & deferred
+- Non-narrative formats leaking the genre filter (SNL, The Nostalgia Critic).
+- Very-long-running outliers kept, handled by normalization.
+- IMDb ratings reflect who bothers to vote, not a representative audience.
+- Our decline metric can't separate organic quality decay from exogenous
+  shocks: e.g. House of Cards' final-season crash was driven by its lead being
+  written out amid scandal, not by the writing. Some "curses" are off-screen
+  events, and we don't distinguish cause — only that the ratings fell.
+- (See `docs/decisions.md` deferred list for the full record.)
+
+---
+
+## Figures to produce / reuse
+- Final-season delta distribution (done).
+- Trajectory-shape breakdown (done).
+- Finale premium (season finale vs premiere vs series finale) — bar.
+- Era / length / genre effects — small multiples or coefficient plot.
+- Example show curves with trend lines (GoT, Picard, The Office).
+
+## Open to-compute items (before drafting prose)
+1. ~~Overall decline/rise headline %~~ DONE — see §2 (42.6% down / 57.4% up;
+   16.9% clear decline). Prior slopes file confirmed sqrt-weighted.
+2. ~~Decide final-narrative language~~ DONE — English (repo standard;
+   international-employer reach). Draft lives in `docs/report_draft.md`.
+3. Decide which figures become final (polish pass).
