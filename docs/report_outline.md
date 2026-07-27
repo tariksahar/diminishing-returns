@@ -12,10 +12,15 @@ Reliability tiers (from the Phase 2 review):
 
 Language: English (decided). **Deliverables: TWO** — (1) this engaging essay
 (`report_draft.md`), the public-facing hook; (2) a formal technical report
-(abstract / data & methods / results / figures / references), arXiv-style, to
-demonstrate rigor. The analysis is complete, so the technical report is mostly
-a re-formatting of the same findings + `decisions.md`. This outline drives the
-essay; the technical report will reuse the same sections in academic form.
+(abstract / data & methods / results / figures / references), to demonstrate
+rigor. This outline drives the essay.
+
+**Both now exist.** The technical report is written (`technical_report.md`):
+Markdown rather than LaTeX, because no TeX toolchain is available here and
+shipping an uncompiled `.tex` would mean publishing something we had never
+seen rendered. It numbers its own figures in order of appearance — the two
+methods figures (fig08, fig09) come first there, so its Figure 3 is the
+essay's Figure 1. Both documents draw on the same nine image files.
 
 ---
 

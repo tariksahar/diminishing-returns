@@ -27,8 +27,12 @@ in shows that ran too long, and in shows that are simply old.
 
 ## Read it
 
-- **[The essay](docs/report_draft.md)** — the full argument, with all nine
-  figures. *(Draft: the analysis is final, the prose is still being tightened.)*
+- **[The essay](docs/report_draft.md)** — the full argument in plain language,
+  with all nine figures. Start here.
+  *(Draft: the analysis is final, the prose is still being tightened.)*
+- **[The technical report](docs/technical_report.md)** — the same findings in
+  formal form: abstract, data, methods, results with confidence intervals,
+  robustness checks, limitations, and the full regression table.
 - **[Decision log](docs/decisions.md)** — every methodological choice, why it
   was made, and the traps that were caught along the way. This is the honest
   record: the mistakes are in here too.
