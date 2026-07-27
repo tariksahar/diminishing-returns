@@ -82,6 +82,41 @@ Rationale, in short:
    this is disclosed as a stated limitation in the report. Revisit only if a
    future analysis turns out to be sensitive to them.
 
+7. **How ratings age over time — OUT OF SCOPE here, worth its own project.**
+   Every rating in this dataset is a **present-day snapshot**, not a
+   contemporaneous reaction. IMDb's public dumps carry one row per title with
+   today's average and today's vote count — no timestamps, no history. A show
+   that ran 2004-2010 is being scored in 2026, largely by people who watched it
+   later and already knew how it ended.
+
+   Considered and rejected: scraping Wayback Machine snapshots of IMDb pages to
+   reconstruct a year-by-year series. Technically possible, but
+   - one show's finale would be an anecdote, and this project's whole standard
+     is that we don't argue from anecdotes; a real sample means thousands of
+     archived-page fetches across ~5 different IMDb layouts since 2010;
+   - Wayback covers famous *episode* pages far better than obscure ones, so the
+     achievable sample leans toward well-known shows — the exact availability
+     bias this report is about, which would make any conclusion self-refuting;
+   - it introduces a second, non-reproducible data provenance beside the
+     official dumps that `src/build.py` rebuilds from scratch;
+   - and even with perfect historical data, a rating that rose from 2010 to
+     2026 cannot separate "people changed their minds" from "a different set of
+     people voted." That needs per-voter data, which does not exist publicly.
+
+   What this changes in the current report: prose must say a finale **is rated**
+   X today, never **was rated** X at the time — we do not know the latter. That
+   rule is applied (see §9's Lost closing).
+
+   Deliberately NOT added to the report's limitations section. Decision: the
+   whole subject stays parked as a separate future project rather than becoming
+   a fourth caveat in §8. The three caveats there are about what the ratings
+   can't tell us; this one is about what a *different dataset* could tell us,
+   which is a different piece of work.
+
+   If it is ever picked up, the cheap first step is an in-data proxy: does the
+   finale premium grow with how long ago a show ended? Confounded with era
+   effects, but computable from what we already have. Not run.
+
 ## Phase 2 decisions
 
 ### Per-show trend slope: weighting scheme
@@ -192,7 +227,7 @@ long the show runs. Phrase the positive claim carefully, per the caveat below.
     third only 24.9%, last third 33.3%. The average is 0.5 because the two
     ends roughly balance out (flaw of averages), with a mild lean toward the
     first third. Report it as "on average mid-run, but highly variable across
-    shows, slightly favoring the first third", not "shows peak in the middle".
+    shows, slightly favouring the first third", not "shows peak in the middle".
   - Also note (consistent with the finale findings): the LAST season is the
     single best season 37.2% of the time vs the FIRST season only 27.1% —
     the folk belief "the first season is always the best" is false in the

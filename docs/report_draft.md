@@ -351,7 +351,7 @@ that simply lost its spark. We can measure the fall; we can't read its cause.
 
 **The crowd isn't the audience.** IMDb scores come from whoever chose to log in
 and vote — a self-selected, disproportionately online crowd, not a
-representative sample of viewers. And that crowd organizes: some of the
+representative sample of viewers. And that crowd organises: some of the
 lowest-scored episodes in our data were rated down in anger, review-bombed by
 fans lodging a protest rather than an opinion. Weighting by vote count blunts
 this; it doesn't erase it.
@@ -366,3 +366,32 @@ None of this sinks the headline: most shows still don't decline, and the finale
 is still usually a peak. It just draws the honest border around what an
 analysis like this can claim. We can map *where* television ratings move, and
 *how much*. The *why* belongs to a messier world the numbers can't see.
+
+## 9. The show you were thinking of
+
+So — back to your show. The one you picked in the first paragraph.
+
+It might genuinely have fallen apart. One in six do, and someone has to be that
+one. But the odds are against it, and there's a fair chance your show is *Lost*.
+
+If any series is shorthand for betrayal, it's that one: six seasons of
+questions, an ending people have been arguing about since 2010, the standing
+punchline for a show that lost the plot. Here is what its ratings actually did.
+
+Season one averaged 8.54. Season six averaged 8.32. That is the entire
+collapse: 0.22 of a point. Two consecutive *Lost* episodes differed by more
+than that on an ordinary week, 69% of the time. And that worst-ever season
+still beats the best season three out of four shows in our data ever managed.
+Across all 121 episodes the trend line is flatter than 98% of everything we
+measured; of the 499 shows that ran past a hundred episodes, exactly twelve
+hold a straighter one. The pilot scored a 9.1. The finale that supposedly
+ruined everything is rated 9.2 today — the eighth-best-rated hour the show ever
+aired.
+
+*Lost* never declined. We only remember it that way.
+
+Which is the whole finding, in one show. The disappointment is real — but it is
+a fact about endings, not about series.
+
+We are, all of us, far better at remembering how a story left us than how it
+treated us along the way.
