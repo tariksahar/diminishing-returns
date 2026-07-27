@@ -284,6 +284,230 @@ show's episodes into disjoint first/second halves.
   to the mean as a big explanation — properly measured it is nearly
   negligible.
 
+## Phase 3 decisions (figures)
+
+### Colour is computed, not eyeballed
+
+Figure colours come from a validated categorical palette rather than
+matplotlib's defaults. The checks (lightness band, chroma floor, Machado-2009
+protan/deutan colour-blind separation, normal-vision floor, WCAG contrast
+against the chart surface) were run rather than reasoned about — the reference
+checker is a Node script and Node isn't installed here, so it was ported to
+Python and confirmed against the reference palette's published numbers
+(worst adjacent CVD ΔE 9.1, normal-vision 19.6) before being trusted.
+
+Results for what the report actually uses:
+- categorical trio `#2a78d6 / #eb6834 / #1baf7a` — passes all-pairs
+  (worst CVD ΔE 9.2, worst normal-vision ΔE 24.0)
+- diverging poles `#2a78d6` (rise) / `#e34948` (decline) — passes cleanly
+
+Two conscious deviations, both allowed by the palette's own rules and recorded
+in `notebooks/figstyle.py`: the aqua slot sits at 2.74:1 contrast (below 3:1),
+so every aqua mark carries a visible direct label; and grey is used as a
+de-emphasis ink (the flat middle of a diverging scale, insignificant
+coefficients), which fails the categorical chroma floor by construction because
+it is not a series colour.
+
+**A real defect the check caught: orange and red cannot share a figure.**
+`#eb6834` and `#e34948` separate by only ΔE 5.6 under simulated deutan vision
+(floor 6.0) and — worse — ΔE 7.1 under *normal* vision against a floor of 15.
+Full-colour readers cannot reliably tell them apart either. The first version
+of fig02 used both (orange fitted line, red/blue quartile bars). Fixed by
+making the quartile bars a single colour, which is independently the right
+call: the quartiles are nominal categories and the sign is already carried by
+the bar's direction and its signed label. Every other pair in use clears both
+floors. The rule is now written into `figstyle.py` so it is not re-broken.
+
+Roles, assigned so that orange and red never meet:
+
+| Colour | Role |
+|---|---|
+| blue `#2a78d6` | data points / single series, and the "rise" pole |
+| red `#e34948` | the "decline" pole — only in figures with no orange |
+| orange `#eb6834` | the fitted trend the analysis actually uses (fig02, fig08, fig09) |
+| aqua `#1baf7a` | a rejected alternative or third class — always directly labelled |
+| grey `#898781` | de-emphasis: reference lines, the flat middle, insignificant estimates |
+
+Consistency this buys: the sqrt-weighted trend line is orange in every figure
+it appears in. An earlier version drew that same estimator orange in fig08 but
+blue in fig09, which would have made the two figures hard to read together.
+
+### Dark mode — DEFERRED to packaging, not dropped
+
+The figures are drawn on a light surface (`#fcfcfb`). Both primary deliverables
+are documents (the essay and an arXiv-style technical report), where light is
+the convention, so this is right for the deliverable. The open question is
+GitHub: the repo is public, most people browse it in dark mode, and a
+light-background figure reads as a bright block there.
+
+Decision: **keep light only for now, revisit at packaging.** It is an aesthetic
+mismatch, not a functional one — the figures stay perfectly legible on a dark
+page because they are opaque. (Transparent backgrounds are the case that
+actually breaks, since dark text lands on a dark page; `savefig.facecolor` in
+`figstyle.py` is what keeps us out of that.) Figures will keep changing through
+the prose passes, and maintaining two sets now would double that churn for a
+surface that is not the deliverable.
+
+The deferral was de-risked by validating the dark palette up front, so this
+cannot fail later:
+- dark trio blue/orange/aqua `#3987e5 / #d95926 / #199e70` — passes all-pairs
+  (CVD ΔE 9.4, normal-vision 20.9, all >= 3:1 on the dark surface)
+- dark poles blue/red `#3987e5 / #e66767` — passes (ΔE 19.2 / 29.0)
+- orange vs red still fails in dark mode too (normal-vision ΔE 7.1), so the
+  "never in the same figure" rule is mode-independent and carries over unchanged
+
+When it is done: add a theme parameter to `figstyle.py` (all colours already
+route through it, so this is one switch plus a re-run), write the dark set to
+`figures/dark/`, and reference both from GitHub-facing markdown with a
+`<picture>` element keyed on `prefers-color-scheme`.
+
+### Uniform figure width
+
+All nine figures are drawn at the same width (12 in / 2400 px), varying only in
+height. Widths previously ranged from 9.5 to 13.5 in; since every figure is
+scaled to the same column in the report, that made identical 9.5pt labels
+render visibly larger in some figures than others. Same width = same apparent
+text size throughout.
+
+### Two silent clipping bugs, found by checking every hard-coded axis limit
+
+Manually set axis limits hide anything outside them. Checked all of them
+against the data they must contain:
+- **fig02 was dropping 16 shows.** Its scatter box was fixed at (4.2, 9.8)
+  while half-means actually run from 1.70 to 9.86 — the lowest-rated shows sat
+  off the corner of the plot with nothing to indicate it. Limits are now
+  derived from the data, so nothing is hidden.
+- **fig04 clipped 6 shows (0.22%) without saying so**, where fig01 disclosed
+  the same thing. Now disclosed in the footnote too.
+
+Both were invisible in the rendered image — the figure looked fine, which is
+exactly why the limits had to be checked against the data rather than by eye.
+
+### Shape classification audited (fig06) — it holds up
+
+The `jumped_the_shark` / `found_itself` / `linear/flat` split was re-derived
+from `episodes.parquet` and checked against the stored
+`_phase2_shape_full.json`: **0 label mismatches across all 3,234 shows**, max
+curvature difference 5e-11. The file and the code agree.
+
+Three things the audit settled:
+
+1. **The label "climbs, then falls" is earned.** Within the jumped_the_shark
+   class the vertex (the peak) sits at a median of 0.50 of the run; only 6.2%
+   peak in the first 0.15-0.25 stretch, while 41.9% peak in the middle fifth.
+   The class is not "declines from the start" wearing an arc's name. Median
+   rise to the peak is 0.37 rating points and median fall from it 0.33 — a
+   real but small arc, which is what licenses the "it is gentle" headline.
+   (13.6% climb by less than 0.1 points, so a minority barely rise at all.)
+2. **The +/-0.05 curvature cut-off does almost no work.** Shares are 44.6 /
+   35.1 / 20.3 at a threshold of 0, and 43.7 / 36.6 / 19.8 even at 0.20. The
+   binding condition is whether the vertex falls inside the run, not the
+   curvature size — so the result is not an artifact of an arbitrary cut.
+3. **"linear/flat" was a misleading name and the figure no longer uses it.**
+   The class means "no turning point inside the run", i.e. monotone over the
+   show's own length — it includes steep straight-line decliners (The Walking
+   Dead, slope -1.19) and steep risers alike. The figure now labels it
+   "Straight line (no turn mid-run)" and states that the class holds both
+   directions, so its average arc is a net of the two.
+
+fig06 also now carries the `found_itself` caveat that was already logged above
+(about a fifth of those recoveries rest on thinly-voted late episodes), which
+the first version of the figure omitted.
+
+### fig08 reframed: direction, not curvature class
+
+fig08 originally showed one show per *curvature class* (∩ / straight / ∪).
+That framing kept producing trios where two of the three declined, which
+required a "not a representative sample" disclaimer to stop the figure
+contradicting the report's own headline. A disclaimer that has to argue with
+its own figure is a sign the figure is wrong, not the reader.
+
+Reframed to **direction**, matching the three groups fig01 already
+establishes — clearly declining, essentially flat, clearly rising. Now the
+figure illustrates the headline instead of fighting it, and no disclaimer is
+needed:
+
+| Show | Group | Slope | Votes |
+|---|---|---|---|
+| Stranger Things (2016-2025) | clearly declining | -0.87 | 2.6M |
+| Friends (1994-2004) | essentially flat | +0.12 | 1.4M |
+| Breaking Bad (2008-2013) | clearly rising | +0.99 | 4.5M |
+
+They also span 1994-2025 and 42-234 episodes, which incidentally shows the
+method working across eras and very different show lengths.
+
+Rejected along the way: **The Office (US)**, the outline's original pick,
+classifies as jumped_the_shark (slope -0.64) — the same class as Game of
+Thrones, so the panel label would have contradicted the data. **M\*A\*S\*H**
+was genuinely flat but too old and US-centric to pull a reader in. **The
+Walking Dead** is a vivid straight-line decliner but made the trio two-thirds
+declining. **Game of Thrones** is deliberately not reused here because it
+already anchors fig09.
+
+### Figure numbers are recomputed, not transcribed
+
+Every figure recomputes its inputs from `data/processed/` and prints the values
+it annotates. All nine reproduce the Phase 2 findings exactly — GoT sqrt slope
+-1.55 and the -2.21 / -1.55 / -1.02 weighting spread, OLS -0.0261 (t = -6.8),
+peak-season means 1.6 / 2.5 / 3.1 / 3.8 / 5.8, the threshold sweep
+29.2 / 22.4 / 12.6 / 6.8 / 3.7 — so the plots and the prose cannot drift apart.
+
+Incidental confirmation: §2's "57.4% rise" and "57.4% essentially flat" are two
+genuinely different quantities that round to the same number. It looks like a
+copy-paste error in the outline and is not one.
+
+## Phase 3b decisions (prose ↔ figure pass)
+
+### Figures go where their numbers are, not at the end of a section
+
+Two figures had been parked after their section's closing line, which deflated
+the closing. Rule adopted: a figure follows the paragraph that states its
+numbers; a section's last line is its last line. §6 was re-ordered for the same
+reason — the two myths were swapped so each figure sits beside the claim it
+supports, which also gave the section a better progression (shape → where the
+peak is → which season wins).
+
+### The inclusion criteria were missing from the essay entirely
+
+§8 referred to "our filters" and no earlier section had ever described them —
+the reader was told what leaked through a net they'd never been shown. §7 now
+opens with **What counts as a show** (the joins, ≥13 episodes, ≥2 seasons, ≥50
+mean votes, genre exclusions, and the resulting 3,234 / 192,720). This was in
+the outline's plan for §7 and had simply never been drafted.
+
+### House of Cards restored to §8
+
+The outline deliberately held House of Cards back from the §1 hook — its −4.24
+crash is a lead actor written out amid scandal, not a show losing its way — and
+assigned it to §8 as the flagship off-screen-shock example. The draft had
+dropped it, so §8 was making its argument without its strongest case. Restored,
+with the season-length detail verified against the data (final season cut from
+13 episodes to 8; season mean 4.19 against ~8.4 for seasons 1–5).
+
+### Claims about named shows are verified, not remembered
+
+Every named-show claim in the essay was re-checked against the parquet rather
+than trusted: the finale flops and saves, HIMYM's 7.56 → 5.5, GoT's 6.40 vs
+8.95, Scrubs' season 9 at 6.21 against ~8.1, SNL's 1,010 episodes. All held.
+Two claims did not survive contact and were changed:
+- "walking off at the top of their game" implied the whole final *season* was
+  strong; those four shows' final seasons are all slightly *below* their own
+  average. Only the last episode spikes. Rewritten to say exactly that (each
+  closes a full two points above the season around it).
+- *Top Gear*'s "finale drawing a fraction of the old audience" was a viewership
+  claim, and we have votes, not viewership. Replaced with the drop we actually
+  measured.
+- "nearly twice the fall of Game of Thrones" for House of Cards was loose
+  (4.24 vs 2.55 is 1.7×, not 2×). Replaced with both numbers.
+
+### Typography and terminology match the prose
+
+Figure text now uses real em dashes rather than `--`, so figures and prose look
+like one document. Jargon that had leaked into figure labels was replaced with
+the words the essay itself uses: `r = +0.79` → "correlation +0.79",
+`By sqrt(votes)` → "By the square root of votes". `|t| > 2` stays in fig05's
+footnote because a plain-language gloss sits right beside it.
+
 ## Language convention
 
 All code, comments, function/variable names, filenames and figure labels are in

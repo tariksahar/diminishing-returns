@@ -125,16 +125,41 @@ The credibility section. Not "what we found" but "why you can trust it."
 
 ---
 
-## Figures to produce / reuse
-- Final-season delta distribution (done).
-- Trajectory-shape breakdown (done).
-- Finale premium (season finale vs premiere vs series finale) — bar.
-- Era / length / genre effects — small multiples or coefficient plot.
-- Example show curves with trend lines (GoT, Picard, The Office).
+## Figures — DONE (Phase 3)
+
+All nine are produced by `notebooks/phase3_figures.py` (style constants in
+`notebooks/figstyle.py`) and land in `figures/`. Each recomputes its own
+numbers from `data/processed/` rather than hard-coding them, and prints what
+it annotated so every label can be checked against `decisions.md`.
+
+| Figure | File | Section |
+|---|---|---|
+| Slope distribution — the headline | `fig01_slope_distribution.png` | §2 |
+| First half vs second half (stability) | `fig02_halves_stability.png` | §2 |
+| Finale premium (finale / premiere / series finale) | `fig03_finale_premium.png` | §3 |
+| Final-season delta + threshold sweep | `fig04_final_season_curse.png` | §4 |
+| Era / length / genre coefficient plot | `fig05_era_length_genre.png` | §5 |
+| Trajectory-shape breakdown + average arcs | `fig06_trajectory_shapes.png` | §6 |
+| Peak-season location (3 panels) | `fig07_peak_location.png` | §6 |
+| Example trajectories (Stranger Things / Friends / Breaking Bad) | `fig08_example_trajectories.png` | §1, §7 |
+| Vote-weighting comparison on GoT | `fig09_weighting_choice.png` | §7 |
+
+Four beyond the original five-figure sketch: the headline slope distribution
+and the halves-stability scatter carry §2's central claim and were missing;
+peak location was split out of the shape figure (three panels of its own); and
+the weighting comparison was added because §7's "whose votes count" argument
+is hard to follow without seeing the three fitted lines.
 
 ## Open to-compute items (before drafting prose)
 1. ~~Overall decline/rise headline %~~ DONE — see §2 (42.6% down / 57.4% up;
    16.9% clear decline). Prior slopes file confirmed sqrt-weighted.
 2. ~~Decide final-narrative language~~ DONE — English (repo standard;
    international-employer reach). Draft lives in `docs/report_draft.md`.
-3. Decide which figures become final (polish pass).
+3. ~~Decide which figures become final (polish pass)~~ DONE — see the table
+   above.
+4. ~~Place figure callouts in `report_draft.md` prose~~ DONE — all nine
+   embedded with numbered captions. Reading order matches the file numbering
+   (fig01…fig09), so no renumbering is needed as the prose moves around;
+   fig08 sits in §7 rather than §1 to keep that alignment.
+5. Dark-mode figure set for GitHub — deferred to packaging, palette already
+   validated. See `docs/decisions.md`.
