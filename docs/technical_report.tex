@@ -111,12 +111,14 @@ episode.
 
 \subsection{Inclusion criteria}
 
-Six filters define the analysis population.
+Six filters define the analysis population (Table~\ref{tab:incl}).
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \small
-\begin{tabular}{lll}
+\caption{Inclusion criteria applied to the joined episode table.}
+\label{tab:incl}
+\begin{tabular}{p{3.0cm}p{4.6cm}p{7.0cm}}
 \toprule
 \textbf{Criterion} & \textbf{Threshold} & \textbf{Rationale} \\
 \midrule
@@ -124,9 +126,8 @@ Title type & \texttt{tvSeries}, \texttt{tvMiniSeries} & excludes films and speci
 Rated episodes & $\ge 13$ & a trajectory needs enough observations \\
 Seasons & $\ge 2$ & decline across seasons is otherwise undefined \\
 Mean votes per episode & $\ge 50$ & limits noise from thinly-rated series \\
-Genre exclusions & not Game-Show, Reality-TV, & non-narrative formats have no \\
-                 & Talk-Show, News & season arc to decline \\
-Documentary cap & kept only if $<100$ episodes & separates series from magazine strands \\
+Genre exclusions & not Game-Show, Reality-TV, Talk-Show, News & non-narrative formats have no season arc to decline \\
+Documentary cap & kept only if $<100$ episodes & separates season-based series from magazine strands \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -136,10 +137,14 @@ or platform field.
 
 \subsection{Sample}
 
-\begin{table}[h]
+Table~\ref{tab:sample} describes the resulting panel.
+
+\begin{table}[htbp]
 \centering
 \small
-\begin{tabular}{ll}
+\caption{The analysis sample after all six filters.}
+\label{tab:sample}
+\begin{tabular}{lp{9.5cm}}
 \toprule
 \textbf{Property} & \textbf{Value} \\
 \midrule
@@ -175,7 +180,7 @@ in the run and $y_i$ its mean rating. We fit
 by weighted least squares with weights $w_i = \sqrt{v_i}$, where $v_i$ is the
 episode's vote count.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig08_example_trajectories.png}
 \caption{Three fitted trajectories, one from each outcome band defined below.
@@ -203,7 +208,7 @@ unweighted fit ($-2.206$ versus $-1.024$), while $\sqrt{v_i}$ gives $-1.546$.
 Log-weighting was also examined and is nearly indistinguishable from unweighted
 in practice. We therefore use $\sqrt{v_i}$ throughout.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig09_weighting_choice.png}
 \caption{The same 73 episodes under three weighting schemes. Raw vote weighting
@@ -264,7 +269,7 @@ alternatives would not change any conclusion drawn here.
 
 \subsection{The distribution of trajectories}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig01_slope_distribution.png}
 \caption{Distribution of the per-show trend $\hat{b}$.}
@@ -280,7 +285,7 @@ distribution massed \emph{at} zero with a mild positive tilt.
 \subsection{Stability across a series' run}
 \label{sec:halves}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig02_halves_stability.png}
 \caption{Each series' first-half mean against its separately measured
@@ -301,19 +306,22 @@ bottom-quartile starters (6.94) gain 0.07.
 
 \subsection{Finale structure}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig03_finale_premium.png}
 \caption{Finale and premiere premia relative to the rest of the season.}
 \end{figure}
 
 Restricting to seasons of at least four rated episodes ($n = 12{,}931$
-seasons):
+seasons), Table~\ref{tab:finale} gives the three contrasts.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \small
-\begin{tabular}{lrr}
+\caption{Finale and premiere premia. ``Above baseline'' is the share of cases
+exceeding the comparison group.}
+\label{tab:finale}
+\begin{tabular}{p{8.8cm}rr}
 \toprule
 \textbf{Contrast} & \textbf{Mean} & \textbf{Above baseline} \\
 \midrule
@@ -331,7 +339,7 @@ flop'' is a one-in-ten event.
 
 \subsection{The final-season effect}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig04_final_season_curse.png}
 \caption{Distribution of $\Delta$ for ended series, with a sensitivity sweep
@@ -356,7 +364,7 @@ mechanical---a late crash necessarily tilts a fitted line downward.
 \subsection{Era, length and genre}
 \label{sec:cross}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig05_era_length_genre.png}
 \caption{OLS coefficients with 95\% confidence intervals.}
@@ -388,7 +396,7 @@ age, length and genre comes close to determining its trajectory.
 
 \subsection{Shape and peak location}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig06_trajectory_shapes.png}
 \caption{Share of series by trajectory shape and the mean fitted arc of each
@@ -406,7 +414,7 @@ cut-off---class shares move from 44.6/35.1/20.3 at a threshold of 0 to
 43.7/36.6/19.8 at 0.20---because the binding condition is the location of the
 vertex, not the size of $c$.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig07_peak_location.png}
 \caption{Location of the best season by series length.}
@@ -569,10 +577,14 @@ physiologically-based model for simulation of color vision deficiency.
 OLS of the per-show trend on era, length, ongoing status and 16 non-exclusive
 genre indicators. $n = 3{,}234$, $R^2 = 0.0603$, residual SD 0.756. Premiere
 year is centred; the genre reference category is ``not carrying that genre''.
+Table~\ref{tab:ols} reports every coefficient.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \small
+\caption{Full cross-sectional model. ``Series'' counts how many series carry
+each genre tag; genres are non-exclusive.}
+\label{tab:ols}
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Variable} & \textbf{Coefficient} & \textbf{Std.\ error} & $t$ & \textbf{Series} \\
