@@ -290,7 +290,7 @@ def fig03_finale_premium():
     ax2.text(50.8, ypos[0] + wording(0.38, 0.24), "coin flip",
              color=INK_2, fontsize=9, va="bottom")
     for y, p in zip(ypos, pcts):
-        ax2.text(p + wording(1, 2.2), y, f"{p:.1f}%", va="center", ha="left",
+        ax2.text(p + wording(1, 3.2), y, f"{p:.1f}%", va="center", ha="left",
                  fontsize=10, color=INK_2)
     ax2.set_yticks(ypos)
     ax2.set_yticklabels([])
@@ -366,8 +366,11 @@ def fig04_final_season_curse():
     for i, (t, v) in enumerate(zip(thresholds, sweep)):
         # The label clears the marker by a fixed data offset; on the paper canvas
         # the text is twice the size relative to the axes, so it needs more room.
-        ax2.text(i, v + wording(1.6, 2.8), f"{v:.1f}%", ha="center",
-                 fontsize=9.5, color=INK_2)
+        # A vertical offset alone does not clear a steep segment of the line,
+        # so on the paper canvas the label also steps left, away from the
+        # descending slope.
+        ax2.text(i - wording(0, 0.12), v + wording(1.6, 3.6), f"{v:.1f}%",
+                 ha="center", fontsize=9.5, color=INK_2)
     ax2.set_xticks(range(len(thresholds)))
     ax2.set_xticklabels([f"{t}" for t in thresholds])
     ax2.set_ylim(0, 36)
