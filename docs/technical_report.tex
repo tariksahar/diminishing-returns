@@ -277,6 +277,18 @@ sample size and the magnitude of the leading $t$-statistics, robust
 alternatives would not change any conclusion drawn here.
 
 \FloatBarrier
+\subsection{Software and figures}
+
+The dataset is built and analysed with NumPy~\cite{numpy} and
+pandas~\cite{pandas}; figures are drawn with Matplotlib~\cite{matplotlib}. Each
+figure recomputes its own inputs from the processed table and prints the values
+it annotates, so a plate cannot drift away from the number quoted beside it.
+Figure colours were checked rather than chosen by eye: the palette was
+validated for colour-vision deficiency using the Machado \emph{et
+al.}~\cite{machado} simulation at full severity, which rejected one pair of
+hues that had been used together.
+
+\FloatBarrier
 \section{Results}
 
 \subsection{The distribution of trajectories}
@@ -353,8 +365,9 @@ are clearly cursed at the $-0.5$ cut. The cursed minority is dominated by
 well-known series (\emph{House of Cards} $-4.24$, \emph{Game of Thrones}
 $-2.55$, \emph{Master of None} $-2.54$, \emph{The Promised Neverland}
 $-2.28$), which we read as the mechanism sustaining the belief: the observable
-instances are disproportionately the famous ones. This interpretation is not
-established by our data; it is consistent with them.
+instances are disproportionately the famous ones, so the cases available to
+recall are not a fair sample of the cases that exist~\cite{tversky}. This
+interpretation is not established by our data; it is consistent with them.
 
 $\Delta$ and $\hat{b}$ correlate $+0.80$, so roughly a third of their variation
 is independent and they are not interchangeable. Notably, the pure ``flat then
@@ -563,6 +576,22 @@ Epidemiology}, 34(1), 215--220.
 \bibitem{cohen}
 Cohen, J. (1988). \emph{Statistical Power Analysis for the Behavioral Sciences}
 (2nd ed.). Lawrence Erlbaum Associates.
+
+\bibitem{tversky}
+Tversky, A., \& Kahneman, D. (1973). Availability: a heuristic for judging
+frequency and probability. \emph{Cognitive Psychology}, 5(2), 207--232.
+
+\bibitem{numpy}
+Harris, C. R., Millman, K. J., van der Walt, S. J., et al. (2020). Array
+programming with NumPy. \emph{Nature}, 585(7825), 357--362.
+
+\bibitem{pandas}
+McKinney, W. (2010). Data structures for statistical computing in Python.
+\emph{Proceedings of the 9th Python in Science Conference}, 56--61.
+
+\bibitem{matplotlib}
+Hunter, J. D. (2007). Matplotlib: a 2D graphics environment.
+\emph{Computing in Science \& Engineering}, 9(3), 90--95.
 
 \bibitem{machado}
 Machado, G. M., Oliveira, M. M., \& Fernandes, L. A. F. (2009). A
