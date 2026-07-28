@@ -53,12 +53,27 @@ RISE, DECLINE, FLAT = BLUE, RED, MUTED
 #           scale, statistically insignificant estimates
 
 
-def apply_style():
+# --- output mode ---------------------------------------------------------------
+# The essay and the technical report want different figures from the same data.
+# ESSAY mode: editorial charts that stand alone on a web page -- headline, subtitle
+#   and source note baked in, drawn on the palette's off-white surface.
+# PAPER mode: plates for a LaTeX document. The caption below the figure does the
+#   naming and the caveats, so the in-image title block is dropped; the surface
+#   becomes pure white so the figure does not read as a grey pasted-in block; and
+#   the canvas is halved so that, once scaled into a 14 cm text column, the labels
+#   land at roughly body-text size instead of ~4 pt.
+PAPER = False
+
+
+def apply_style(paper=False):
     """Set the global rcParams. Call once, before creating any figure."""
+    global PAPER
+    PAPER = paper
+    surface = "#ffffff" if paper else SURFACE
     mpl.rcParams.update({
-        "figure.facecolor": SURFACE,
-        "axes.facecolor": SURFACE,
-        "savefig.facecolor": SURFACE,
+        "figure.facecolor": surface,
+        "axes.facecolor": surface,
+        "savefig.facecolor": surface,
         "savefig.dpi": 200,
         "figure.dpi": 110,
         "font.family": "sans-serif",
@@ -123,7 +138,15 @@ def frame(fig, title, subtitle=None, footnote=None, rect=(0.055, 0.085, 0.985, 0
 
     The title block and footnote live in figure coordinates, so `rect` reserves
     the space for them; matplotlib's tight_layout then packs the axes inside.
+
+    In PAPER mode the title block is not drawn at all -- the LaTeX caption names
+    the figure and carries its caveats -- so the axes take the reclaimed space.
+    Callers pass the same arguments either way; only the rendering differs.
     """
+    if PAPER:
+        left, _, right, _ = rect
+        fig.tight_layout(rect=[left, 0.02, right, 0.98])
+        return
     fig.tight_layout(rect=list(rect))
     fig.text(0.055, 0.955, title, ha="left", va="top",
              fontsize=13.5, fontweight="bold", color=INK)
@@ -136,8 +159,11 @@ def frame(fig, title, subtitle=None, footnote=None, rect=(0.055, 0.085, 0.985, 0
 
 
 def save(fig, name):
-    """Write to figures/<name>.png and report the path."""
-    path = f"figures/{name}.png"
+    """Write to figures/<name>.png (or figures/paper/ in PAPER mode)."""
+    import os
+    folder = "figures/paper" if PAPER else "figures"
+    os.makedirs(folder, exist_ok=True)
+    path = f"{folder}/{name}.png"
     fig.savefig(path)
     plt.close(fig)
     print(f"  saved {path}")

@@ -8,6 +8,8 @@ against docs/decisions.md.
 Run from the repo root:  .venv/Scripts/python.exe notebooks/phase3_figures.py
 """
 
+import sys
+
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -25,6 +27,33 @@ SOURCE = "Source: IMDb public dataset. 3,234 shows / 192,720 rated episodes."
 # Every figure is drawn at the same width so that, once scaled to the report's
 # column, text renders at the same size throughout. Only the height varies.
 W = 12.0
+
+# Pass --paper to render the LaTeX plates instead of the essay figures.
+# Halving the canvas doubles every element's size relative to the image, so a
+# 9.5 pt label placed into a 14 cm text column arrives at roughly 9 pt rather
+# than the ~4.8 pt the full-size canvas produced. Line widths and markers scale
+# with it, so the plot keeps its proportions exactly.
+PAPER = "--paper" in sys.argv
+SCALE = 0.5 if PAPER else 1.0
+
+
+def canvas(height):
+    """Figure size for a full-width figure of the given height, at this scale."""
+    return (W * SCALE, height * SCALE)
+
+
+def wording(essay, paper):
+    """Pick the wording for the current output mode.
+
+    Named `wording` rather than `label` because several figures already use
+    `label` as a loop variable, which would shadow the function.
+
+    Halving the canvas doubles the size of every label relative to the image, so
+    wording written for the wide essay canvas overruns a paper panel and collides
+    with its neighbour. The paper variant is terse because the LaTeX caption
+    underneath carries the detail the short form drops.
+    """
+    return paper if PAPER else essay
 
 
 # --- shared fitting helpers (identical to phase2_shape.py) -------------------
@@ -76,7 +105,7 @@ def fig01_slope_distribution():
     # edges, so no bar straddles a boundary.
     colors = [RED if c < -0.5 else (BLUE if c > 0.5 else MUTED) for c in centers]
 
-    fig, ax = plt.subplots(figsize=(W, 5.6))
+    fig, ax = plt.subplots(figsize=canvas(5.6))
     # The 0.6pt surface-coloured edge is the "surface gap" separating adjacent
     # bars — it is a spacer, not a border ring.
     ax.bar(centers, counts, width=0.1, color=colors,
@@ -104,7 +133,8 @@ def fig01_slope_distribution():
                 fontsize=9.5, color=INK_2)
 
     ax.set_xlim(-3, 3)
-    ax.set_xlabel("Rating points gained or lost across the show's full run")
+    ax.set_xlabel(wording("Rating points gained or lost across the show's full run",
+                          "Rating points gained or lost across the run"))
     ax.set_ylabel("Number of shows")
     fs.style_axes(ax, grid="y")
     fs.frame(
@@ -141,7 +171,7 @@ def fig02_halves_stability():
         print(f"  {q:<14} first {row['b']:.2f} -> second {row['o']:.2f} "
               f"({row['change']:+.2f})")
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(W, 5.2),
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=canvas(5.2),
                                    gridspec_kw={"width_ratios": [1.25, 1]})
 
     ax1.scatter(r["b"], r["o"], s=7, color=BLUE, alpha=0.22, linewidths=0)
@@ -151,16 +181,17 @@ def fig02_halves_stability():
     hi = max(r["b"].max(), r["o"].max()) + 0.3
     lims = (lo, hi)
     ax1.plot(lims, lims, color=MUTED, linewidth=1.2,
-             label="No change (second half = first half)")
+             label=wording("No change (second half = first half)", "No change"))
     xs = np.linspace(*lims, 50)
     ax1.plot(xs, fit[0] * xs + fit[1], color=ORANGE, linewidth=2,
-             label=f"Actual fit (slope {fit[0]:.2f})")
+             label=wording(f"Actual fit (slope {fit[0]:.2f})", f"Fit (slope {fit[0]:.2f})"))
     ax1.set_xlim(*lims)
     ax1.set_ylim(*lims)
     ax1.set_xlabel("Mean rating, first half of the run")
     ax1.set_ylabel("Mean rating, second half")
     ax1.legend(loc="upper left")
-    fs.panel_title(ax1, f"Each show, halved — correlation {corr:+.2f}")
+    fs.panel_title(ax1, wording(f"Each show, halved — correlation {corr:+.2f}",
+                             f"Correlation {corr:+.2f}"))
     fs.style_axes(ax1, grid="both")
 
     # One series, one colour: the quartiles are nominal categories and the sign
@@ -176,10 +207,13 @@ def fig02_halves_stability():
                  ha="center", va="bottom" if val >= 0 else "top",
                  fontsize=10, color=INK_2)
     ax2.set_xticks(range(4))
-    ax2.set_xticklabels(qs.index, fontsize=9)
+    ax2.set_xticklabels(wording(list(qs.index),
+                                ["Weakest", "2nd", "3rd", "Strongest"]), fontsize=9)
     ax2.set_ylim(-0.13, 0.13)
-    ax2.set_ylabel("Change in rating, first half -> second half")
-    fs.panel_title(ax2, "Change by how strongly the show started")
+    ax2.set_ylabel(wording("Change in rating, first half -> second half",
+                           "Change in rating"))
+    fs.panel_title(ax2, wording("Change by how strongly the show started",
+                              "Change by starting quartile"))
     fs.style_axes(ax2, grid="y")
 
     fs.frame(
@@ -223,7 +257,7 @@ def fig03_finale_premium():
         print(f"  {label.replace(chr(10), ' '):<34} mean {mean:+.3f}  above {pct:.1f}%  n={n:,}")
     print(f"  series finale drops >= 0.5: {100*(series <= -0.5).mean():.1f}%")
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(W, 4.8))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=canvas(4.8))
     ypos = np.arange(3)[::-1]
 
     means = [i[1] for i in items]
@@ -236,9 +270,13 @@ def fig03_finale_premium():
                  fontsize=10, color=INK_2)
     ax1.set_yticks(ypos)
     ax1.set_yticklabels([i[0] for i in items], fontsize=9)
-    ax1.set_xlim(-0.1, 0.32)
+    # The negative bar's value label is drawn to its left; on the paper canvas
+    # that text is larger, so the axis needs more room or it lands on the
+    # category labels outside the plot.
+    ax1.set_xlim(wording(-0.1, -0.17), 0.32)
     ax1.set_xlabel("Average rating premium (points)")
-    fs.panel_title(ax1, "How much better than the rest")
+    fs.panel_title(ax1, wording("How much better than the rest",
+                              "Mean premium"))
     fs.style_axes(ax1, grid="x")
 
     pcts = [i[2] for i in items]
@@ -246,15 +284,20 @@ def fig03_finale_premium():
              color=[BLUE if p >= 50 else RED for p in pcts],
              edgecolor=SURFACE, linewidth=0.6)
     ax2.axvline(50, color=INK, linewidth=1.2)
-    ax2.text(50.8, ypos[0] + 0.38, "coin flip", color=INK_2, fontsize=9, va="bottom")
+    # Sits above the top bar in the essay; on the paper canvas that space is
+    # taken by the panel title, so it moves below the bottom bar instead.
+    ax2.text(50.8, ypos[0] + wording(0.38, 0.24), "coin flip",
+             color=INK_2, fontsize=9, va="bottom")
     for y, p in zip(ypos, pcts):
         ax2.text(p + 1, y, f"{p:.1f}%", va="center", ha="left",
                  fontsize=10, color=INK_2)
     ax2.set_yticks(ypos)
     ax2.set_yticklabels([])
     ax2.set_xlim(0, 85)
-    ax2.set_xlabel("Share that beats the rest of the season (%)")
-    fs.panel_title(ax2, "How often it comes out on top")
+    ax2.set_xlabel(wording("Share that beats the rest of the season (%)",
+                           "Share above baseline (%)"))
+    fs.panel_title(ax2, wording("How often it comes out on top",
+                              "Share above baseline"))
     fs.style_axes(ax2, grid="x")
 
     fs.frame(
@@ -288,7 +331,7 @@ def fig04_final_season_curse():
     centers = (edges[:-1] + edges[1:]) / 2
     colors = [RED if c < -0.5 else (BLUE if c > 0.5 else MUTED) for c in centers]
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(W, 5.2),
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=canvas(5.2),
                                    gridspec_kw={"width_ratios": [1.5, 1]})
 
     ax1.bar(centers, counts, width=0.1, color=colors,
@@ -297,17 +340,23 @@ def fig04_final_season_curse():
     ax1.axvline(-0.5, color=INK, linewidth=1.2)
     top = counts.max()
     ax1.set_ylim(0, top * 1.22)
-    ax1.text(-0.58, top * 1.16, "clear curse threshold", ha="right", va="center",
-             fontsize=9, color=INK_2)
-    ax1.text(-1.78, top * 0.50, f"{100*(d <= -0.5).mean():.1f}% of ended shows",
-             ha="center", va="bottom", fontsize=12.5, fontweight="bold", color=RED)
-    ax1.text(-1.78, top * 0.47, "lose half a point or more",
-             ha="center", va="top", fontsize=9.5, color=INK_2)
+    ax1.text(-0.58, top * 1.16, wording("clear curse threshold", "threshold"),
+             ha="right", va="center", fontsize=9, color=INK_2)
+    # The large red callout is the essay's headline device. On the paper canvas
+    # it swamps the plot and collides with the axis, and the caption states the
+    # same figure, so it is dropped there.
+    if not PAPER:
+        ax1.text(-1.78, top * 0.50, f"{100*(d <= -0.5).mean():.1f}% of ended shows",
+                 ha="center", va="bottom", fontsize=12.5, fontweight="bold", color=RED)
+        ax1.text(-1.78, top * 0.47, "lose half a point or more",
+                 ha="center", va="top", fontsize=9.5, color=INK_2)
     ax1.set_xlim(-3, 3)
-    ax1.set_xlabel("Final season vs the rest of the show (rating points)")
+    ax1.set_xlabel(wording("Final season vs the rest of the show (rating points)",
+                           "Final season vs the rest (points)"))
     ax1.set_ylabel("Number of shows")
-    fs.panel_title(ax1, f"Almost a coin flip: {pct_down:.1f}% down, "
-                        f"{100 - pct_down:.1f}% up")
+    fs.panel_title(ax1, wording(f"Almost a coin flip: {pct_down:.1f}% down, "
+                                f"{100 - pct_down:.1f}% up",
+                                f"{pct_down:.1f}% down, {100 - pct_down:.1f}% up"))
     fs.style_axes(ax1, grid="y")
 
     ax2.plot(range(len(thresholds)), sweep, color=RED, marker="o",
@@ -318,9 +367,11 @@ def fig04_final_season_curse():
     ax2.set_xticks(range(len(thresholds)))
     ax2.set_xticklabels([f"{t}" for t in thresholds])
     ax2.set_ylim(0, 36)
-    ax2.set_xlabel("Threshold used to call a final season 'cursed' (points)")
+    ax2.set_xlabel(wording("Threshold used to call a final season 'cursed' (points)",
+                           "Threshold (points)"))
     ax2.set_ylabel("Share of ended shows (%)")
-    fs.panel_title(ax2, "The verdict doesn't hinge on where we cut")
+    fs.panel_title(ax2, wording("The verdict doesn't hinge on where we cut",
+                              "Threshold sweep"))
     fs.style_axes(ax2, grid="y")
 
     fs.frame(
@@ -382,7 +433,7 @@ def fig05_era_length_genre():
         ax.set_yticklabels([r[0] for r in rows], fontsize=9)
         ax.set_ylim(-0.6, len(rows) - 0.4)
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(W, 6.6),
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=canvas(6.6),
                                    gridspec_kw={"width_ratios": [1, 1]})
 
     # Era is shown per DECADE (coefficient x10) so it is legible beside the
@@ -391,14 +442,17 @@ def fig05_era_length_genre():
     draw(ax1, [("Each extra season", "n_season", 1),
                ("Ten years newer", "yr_c", 10),
                ("Still airing", "ongoing_i", 1)])
-    ax1.set_xlabel("Effect on the show's trend (rating points across the run)")
-    fs.panel_title(ax1, "Length and age — each net of the other")
+    ax1.set_xlabel(wording("Effect on the show's trend (rating points across the run)",
+                           "Effect on trend (points)"))
+    fs.panel_title(ax1, wording("Length and age — each net of the other",
+                              "Length and age"))
     fs.style_axes(ax1, grid="x")
 
     order = sorted(GENRES, key=lambda g: coef[g][0])
     draw(ax2, [(g, g, 1) for g in order])
-    ax2.set_xlabel("Effect on the show's trend, net of age and length")
-    fs.panel_title(ax2, "Genre matters far less")
+    ax2.set_xlabel(wording("Effect on the show's trend, net of age and length",
+                           "Net of age and length"))
+    fs.panel_title(ax2, wording("Genre matters far less", "Genre"))
     fs.style_axes(ax2, grid="x")
 
     fs.frame(
@@ -445,7 +499,7 @@ def fig06_trajectory_shapes():
         if len(shape):
             curves[shape.iloc[0]].append(curve - curve.mean())
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(W, 5.4),
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=canvas(5.4),
                                    gridspec_kw={"width_ratios": [1, 1.15]})
 
     ypos = np.arange(len(order))[::-1]
@@ -459,21 +513,28 @@ def fig06_trajectory_shapes():
     ax1.set_yticklabels([labels[k] for k in order], fontsize=9)
     ax1.set_xlim(0, 55)
     ax1.set_xlabel("Share of shows (%)")
-    fs.panel_title(ax1, "Which shape a show's run takes")
+    fs.panel_title(ax1, wording("Which shape a show's run takes",
+                              "Share of shows"))
     fs.style_axes(ax1, grid="x")
 
     for k in order:
         mean_curve = np.mean(curves[k], axis=0)
         ax2.plot(xs, mean_curve, color=colors[k], linewidth=2.4,
                  label=labels[k].replace("\n", " "))
-        ax2.text(1.01, mean_curve[-1], labels[k].split("\n")[0],
-                 color=INK_2, fontsize=9, va="center", ha="left")
+        # The curve names ride the line ends in the essay. On the paper canvas
+        # they would run off the plate, and they are redundant there anyway:
+        # the left panel already names each class in its own colour.
+        if not PAPER:
+            ax2.text(1.01, mean_curve[-1], labels[k].split("\n")[0],
+                     color=INK_2, fontsize=9, va="center", ha="left")
     ax2.axhline(0, color=AXIS, linewidth=0.8)
     ax2.set_xlim(0, 1)
     ax2.set_xticks([0, 0.5, 1])
-    ax2.set_xticklabels(["First episode", "Midpoint", "Last episode"])
-    ax2.set_ylabel("Rating vs the show's own average")
-    fs.panel_title(ax2, "The average arc of each shape")
+    ax2.set_xticklabels(wording(["First episode", "Midpoint", "Last episode"],
+                                ["First", "Mid", "Last"]))
+    ax2.set_ylabel(wording("Rating vs the show's own average",
+                           "Rating vs show mean"))
+    fs.panel_title(ax2, wording("The average arc of each shape", "Average arc"))
     fs.style_axes(ax2, grid="y")
 
     fs.frame(
@@ -487,7 +548,7 @@ def fig06_trajectory_shapes():
         "Robustness: the shares move less than one point across curvature\n"
         "cut-offs from 0 to 0.10. About a fifth of 'found itself' cases rest on "
         f"thinly-voted late episodes (see docs/decisions.md). {SOURCE}",
-        rect=(0.05, 0.155, 0.93, 0.845),
+        rect=(0.05, 0.155, wording(0.93, 0.985), 0.845),
     )
     return fs.save(fig, "fig06_trajectory_shapes")
 
@@ -530,7 +591,7 @@ def fig07_peak_location():
           f"/ last {thirds[2]:.1f}")
     print(f"  best season is the first: {pct_first:.1f}%, the last: {pct_last:.1f}%")
 
-    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(W, 5.0),
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=canvas(5.0),
                                         gridspec_kw={"width_ratios": [1.1, 1, 0.8]})
 
     ax1.bar(range(len(labels_x)), abs_means, width=0.6, color=BLUE,
@@ -540,9 +601,11 @@ def fig07_peak_location():
     ax1.set_xticks(range(len(labels_x)))
     ax1.set_xticklabels(labels_x)
     ax1.set_xlabel("How many seasons the show ran")
-    ax1.set_ylabel("Average best season (season number)")
+    ax1.set_ylabel(wording("Average best season (season number)",
+                           "Average best season"))
     ax1.set_ylim(0, 6.6)
-    fs.panel_title(ax1, "The peak moves later in longer shows")
+    fs.panel_title(ax1, wording("The peak moves later in longer shows",
+                              "Mean best season"))
     fs.style_axes(ax1, grid="y")
 
     # One series, one colour: the three thirds are nominal categories, so
@@ -552,10 +615,12 @@ def fig07_peak_location():
     for i, v in enumerate(thirds):
         ax2.text(i, v + 1, f"{v:.1f}%", ha="center", fontsize=10, color=INK_2)
     ax2.set_xticks(range(3))
-    ax2.set_xticklabels(["First third", "Middle third", "Last third"])
+    ax2.set_xticklabels(wording(["First third", "Middle third", "Last third"],
+                                ["First", "Middle", "Last"]))
     ax2.set_ylim(0, 52)
     ax2.set_ylabel("Share of shows (%)")
-    fs.panel_title(ax2, "But it is not concentrated there")
+    fs.panel_title(ax2, wording("But it is not concentrated there",
+                              "Peak by third"))
     fs.style_axes(ax2, grid="y")
 
     ax3.bar([0, 1], [pct_first, pct_last], width=0.5, color=BLUE,
@@ -563,10 +628,11 @@ def fig07_peak_location():
     for i, v in enumerate([pct_first, pct_last]):
         ax3.text(i, v + 1, f"{v:.1f}%", ha="center", fontsize=10, color=INK_2)
     ax3.set_xticks([0, 1])
-    ax3.set_xticklabels(["First season\nis the best", "Last season\nis the best"])
+    ax3.set_xticklabels(wording(["First season\nis the best", "Last season\nis the best"],
+                                ["First\nseason", "Last\nseason"]))
     ax3.set_ylim(0, 52)
     ax3.set_ylabel("Share of shows (%)")
-    fs.panel_title(ax3, "And rarely the first")
+    fs.panel_title(ax3, wording("And rarely the first", "First vs last"))
     fs.style_axes(ax3, grid="y")
 
     fs.frame(
@@ -598,7 +664,7 @@ EXAMPLES = [
 
 def fig08_example_trajectories():
     """Sections 1 and 7 -- what a single show's data actually looks like."""
-    fig, axes = plt.subplots(1, 3, figsize=(W, 5.0), sharey=True)
+    fig, axes = plt.subplots(1, 3, figsize=canvas(5.0), sharey=True)
     xs = np.linspace(0, 1, 60)
 
     for ax, (tconst, title, blurb) in zip(axes, EXAMPLES):
@@ -617,16 +683,18 @@ def fig08_example_trajectories():
         ax.set_xticks([0, 0.5, 1])
         ax.set_xticklabels(["First", "Middle", "Last"])
         ax.set_xlabel("Episode order")
-        fs.panel_title(ax, f"{title} — {blurb}\ntrend {b:+.2f} points across the run")
+        fs.panel_title(ax, wording(f"{title} — {blurb}\n"
+                                 f"trend {b:+.2f} points across the run",
+                                 f"{title}  ({b:+.2f})"))
         fs.style_axes(ax, grid="y")
 
     axes[0].set_ylabel("Episode rating")
     axes[0].set_ylim(5.2, 10.1)  # contains every episode of all three shows
     # One legend for the whole figure: two fitted lines plus the marker key.
-    axes[2].plot([], [], color=ORANGE, linewidth=2.4, label="Straight-line trend")
-    axes[2].plot([], [], color=MUTED, linewidth=1.6, label="Curved trend")
+    axes[2].plot([], [], color=ORANGE, linewidth=2.4, label=wording("Straight-line trend", "Linear"))
+    axes[2].plot([], [], color=MUTED, linewidth=1.6, label=wording("Curved trend", "Quadratic"))
     axes[2].scatter([], [], s=40, color=BLUE, alpha=0.45, linewidths=0,
-                    label="Episode (size = votes)")
+                    label=wording("Episode (size = votes)", "Episode"))
     axes[2].legend(loc="lower right")
 
     fs.frame(
@@ -652,8 +720,9 @@ def fig09_weighting_choice():
     # chosen fit is ORANGE and drawn thicker — the same colour the fitted
     # trend carries in fig02 and fig08, so one estimator keeps one identity.
     fits = {
-        "By raw votes": (weighted_linear(x, y, v), AQUA, 1.8),
-        "By the square root of votes — chosen": (
+        wording("By raw votes", "Raw votes"): (
+            weighted_linear(x, y, v), AQUA, 1.8),
+        wording("By the square root of votes — chosen", "√votes (chosen)"): (
             weighted_linear(x, y, np.sqrt(v)), ORANGE, 2.8),
         "Unweighted": (weighted_linear(x, y, np.ones_like(v)), MUTED, 1.8),
     }
@@ -668,7 +737,7 @@ def fig09_weighting_choice():
           f"rating {y[top6[-1]]}, votes {v[top6[-1]]:,}")
     print(f"  of the 6 most-voted episodes, {is_final[top6].sum()} are final-season")
 
-    fig, ax = plt.subplots(figsize=(W, 5.8))
+    fig, ax = plt.subplots(figsize=canvas(5.8))
     xs = np.linspace(0, 1, 60)
     ax.scatter(x, y, s=8 + 90 * (v / v.max()), color=BLUE, alpha=0.4, linewidths=0)
     for label, ((a, b), color, lw) in fits.items():
@@ -676,13 +745,15 @@ def fig09_weighting_choice():
 
     # Call out the two episodes that drive the difference between the fits.
     biggest = top6[-1]
-    ax.annotate(f"most-voted episode of all:\na mid-run 9.9 "
-                f"({v[biggest]/1000:.0f}k votes)",
+    ax.annotate(wording(f"most-voted episode of all:\na mid-run 9.9 "
+                        f"({v[biggest]/1000:.0f}k votes)",
+                        "most-voted: a mid-run 9.9"),
                 xy=(x[biggest], y[biggest]), xytext=(x[biggest] - 0.30, 9.9),
                 fontsize=9, color=INK_2, ha="left", va="center",
                 arrowprops=dict(arrowstyle="-", color=MUTED, linewidth=1))
     worst = int(np.argmin(y))
-    ax.annotate(f"final season: heavily voted\nand rated far below the rest",
+    ax.annotate(wording("final season: heavily voted\nand rated far below the rest",
+                        "final season"),
                 xy=(x[worst], y[worst]), xytext=(0.52, 4.6),
                 fontsize=9, color=INK_2, ha="left", va="center",
                 arrowprops=dict(arrowstyle="-", color=MUTED, linewidth=1))
@@ -709,7 +780,19 @@ def fig09_weighting_choice():
 
 
 def main():
-    fs.apply_style()
+    # Figure labels may contain maths symbols the console encoding cannot
+    # represent (a Windows terminal defaults to a legacy code page). Without
+    # this, printing a diagnostic line would abort a run whose figures are
+    # perfectly fine.
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        pass
+
+    fs.apply_style(paper=PAPER)
+    if PAPER:
+        print("PAPER mode: no in-image titles, white surface, half canvas "
+              "-> figures/paper/\n")
     for fn in [fig01_slope_distribution, fig02_halves_stability,
                fig03_finale_premium, fig04_final_season_curse,
                fig05_era_length_genre, fig06_trajectory_shapes,

@@ -543,6 +543,66 @@ the words the essay itself uses: `r = +0.79` → "correlation +0.79",
 `By sqrt(votes)` → "By the square root of votes". `|t| > 2` stays in fig05's
 footnote because a plain-language gloss sits right beside it.
 
+## Phase 3c decisions (the technical report's own figure set)
+
+### Why the essay figures could not be reused in the paper
+
+Compiling the report and looking at the pages — rather than at the source —
+exposed four faults that all had one cause: the figures were designed as
+standalone editorial graphics.
+
+1. **Labels were unreadable.** Drawn on a 12-inch canvas and scaled into a
+   6.4-inch column, a 9 pt axis label arrives at 4.8 pt and an 8 pt footnote at
+   4.2 pt, against 11 pt body text. Below roughly 6 pt, print stops being
+   readable.
+2. **Every figure had two titles.** The in-image headline plus the LaTeX
+   caption underneath. Papers give that job to the caption alone.
+3. **A figure referred to itself.** The in-image footnote of the
+   example-trajectories plate says "the three groups in Figure 1" — true in the
+   essay, where that figure is number 8, and wrong in the report, where it *is*
+   Figure 1. Baked-in cross-references cannot survive renumbering.
+4. **The off-white surface** (`#fcfcfb`) read as a grey pasted-in block against
+   the page.
+
+### One script, two rendering modes
+
+Resolved with a `--paper` switch on `notebooks/phase3_figures.py` rather than a
+second set of figures. The data, the fits and every printed number are shared;
+only presentation branches:
+
+- no in-image title block (`figstyle.frame` becomes layout-only)
+- pure white surface
+- half canvas, which doubles every element's size relative to the image and so
+  lands labels near body-text size once scaled into the column
+- terse label variants via a `wording(essay, paper)` helper, because text
+  written for the wide canvas collides on the narrow one
+- output to `figures/paper/`
+
+This is deliberately not the dual-maintenance pattern rejected for the dark-mode
+figures and the duplicated documents: there is one source of truth, and the two
+outputs cannot disagree about a number. Verified after the change — the essay
+figures are byte-identical, so the paper branch cannot silently alter them.
+
+**What the paper plates drop, the captions must carry.** Removing the in-image
+footnotes would have deleted the axis-clipping disclosures and the sample sizes.
+Those were moved into the LaTeX captions rather than lost: Figure 3 states that
+18 series fall outside its clipped axis, Figure 6 that 6 do, Figure 9 that the
+middle panel is restricted to the 915 series with at least five seasons.
+
+### Layout fixes the rendered PDF exposed
+
+- **Line length.** A 2.4 cm margin on A4 gave a 16.2 cm measure and a median
+  line of 92 characters, well past the 45–75 comfortable band. Margins are now
+  3.4 cm, for roughly 72.
+- **Float pile-up.** One page carried three floats and no body text at all,
+  with wide white bands between them. `placeins` plus a `\FloatBarrier` at each
+  section boundary stops floats queueing across sections.
+- **A table that repeated a figure.** The finale-premium table listed exactly
+  the three numbers its own figure plotted, on the same page. The table is gone
+  and the numbers are in the prose, which also relieved the float pressure.
+- **Table widths** were recomputed for the narrower measure; the old `p{}`
+  values summed wider than the new text block and would have overflowed.
+
 ## Language convention
 
 All code, comments, function/variable names, filenames and figure labels are in

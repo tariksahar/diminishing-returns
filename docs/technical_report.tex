@@ -8,16 +8,25 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage[margin=2.4cm]{geometry}
+% 3.4 cm side margins give a ~14 cm measure, about 72 characters a line. The
+% earlier 2.4 cm setting produced a 16.2 cm measure and a median line of 92
+% characters, well past the point where a reader starts losing their place.
+\usepackage[a4paper,left=3.4cm,right=3.4cm,top=2.8cm,bottom=2.8cm]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{amsmath,amssymb}
 \usepackage[font=small,labelfont=bf]{caption}
 \usepackage{microtype}
 \usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue]{hyperref}
+% Keeps each section's floats inside that section instead of letting them queue
+% up and land three-to-a-page with no text between them.
+\usepackage{placeins}
 
-% Find the figures whether they sit next to the .tex or in a figures/ folder.
-\graphicspath{{./}{figures/}{../figures/}}
+% Find the figures whether they sit next to the .tex or in a folder. The paper/
+% plates come first: same data as the essay figures, but with no in-image title
+% block (the caption does that job), a white surface, and labels sized to be
+% legible once scaled into this column.
+\graphicspath{{./}{paper/}{figures/paper/}{../figures/paper/}{figures/}{../figures/}}
 
 \title{\bfseries Do Television Series Decline Over Their Run?\\[0.3em]
 \large Evidence from 192{,}720 IMDb Episode Ratings}
@@ -85,6 +94,7 @@ answer. Section~\ref{sec:robust} documents four such artefacts, one of which
 produced an apparently strong effect that survived neither reformulation nor
 replication.
 
+\FloatBarrier
 \section{Data}
 
 \subsection{Source}
@@ -118,7 +128,7 @@ Six filters define the analysis population (Table~\ref{tab:incl}).
 \small
 \caption{Inclusion criteria applied to the joined episode table.}
 \label{tab:incl}
-\begin{tabular}{p{3.0cm}p{4.6cm}p{7.0cm}}
+\begin{tabular}{p{3.6cm}p{4.0cm}p{5.2cm}}
 \toprule
 \textbf{Criterion} & \textbf{Threshold} & \textbf{Rationale} \\
 \midrule
@@ -144,7 +154,7 @@ Table~\ref{tab:sample} describes the resulting panel.
 \small
 \caption{The analysis sample after all six filters.}
 \label{tab:sample}
-\begin{tabular}{lp{9.5cm}}
+\begin{tabular}{lp{9.0cm}}
 \toprule
 \textbf{Property} & \textbf{Value} \\
 \midrule
@@ -167,6 +177,7 @@ normalises episode order to $[0,1]$ so that run length cannot mechanically
 inflate a slope, and length is analysed as an explanatory variable in its own
 right (Section~\ref{sec:cross}).
 
+\FloatBarrier
 \section{Methods}
 
 \subsection{Per-show trajectory}
@@ -265,6 +276,7 @@ over all $n = 3{,}234$ series, with premiere year centred and genres entered as
 sample size and the magnitude of the leading $t$-statistics, robust
 alternatives would not change any conclusion drawn here.
 
+\FloatBarrier
 \section{Results}
 
 \subsection{The distribution of trajectories}
@@ -272,7 +284,7 @@ alternatives would not change any conclusion drawn here.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig01_slope_distribution.png}
-\caption{Distribution of the per-show trend $\hat{b}$.}
+\caption{Distribution of the per-show trend $\hat{b}$ across all $3{,}234$ series. Red marks clear decline ($\hat{b} \le -0.5$), blue clear rise, grey the flat band between them; the black rule is the median. The axis is clipped to $\pm 3$ points, which places 18 series (0.6\%) outside it.}
 \end{figure}
 
 The trend distribution is centred slightly above zero (mean $+0.073$, median
@@ -288,8 +300,7 @@ distribution massed \emph{at} zero with a mild positive tilt.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig02_halves_stability.png}
-\caption{Each series' first-half mean against its separately measured
-second-half mean.}
+\caption{Each series' first-half mean against its separately measured second-half mean, all $3{,}234$ series. The grey line is equality, the orange line the fitted relationship. Right: mean change from first half to second, by quartile of first-half rating.}
 \end{figure}
 
 Splitting each series into disjoint halves, first-half and second-half means
@@ -309,28 +320,19 @@ bottom-quartile starters (6.94) gain 0.07.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig03_finale_premium.png}
-\caption{Finale and premiere premia relative to the rest of the season.}
+\caption{Finale and premiere premia relative to the rest of the season. Left:
+mean premium in rating points. Right: share of cases beating the comparison
+group, against the 50\% line. Seasons of at least four rated episodes,
+$n = 12{,}931$ seasons and $3{,}082$ series finales.}
+\label{fig:finale}
 \end{figure}
 
-Restricting to seasons of at least four rated episodes ($n = 12{,}931$
-seasons), Table~\ref{tab:finale} gives the three contrasts.
-
-\begin{table}[htbp]
-\centering
-\small
-\caption{Finale and premiere premia. ``Above baseline'' is the share of cases
-exceeding the comparison group.}
-\label{tab:finale}
-\begin{tabular}{p{8.8cm}rr}
-\toprule
-\textbf{Contrast} & \textbf{Mean} & \textbf{Above baseline} \\
-\midrule
-Season finale versus rest of its season & $+0.253$ & 72.6\% \\
-Season premiere versus rest of its season & $-0.040$ & 43.3\% \\
-Series finale versus its final-season body ($n = 3{,}082$) & $+0.256$ & 71.6\% \\
-\bottomrule
-\end{tabular}
-\end{table}
+Restricting to seasons of at least four rated episodes ($n = 12{,}931$ seasons),
+the season finale beats the rest of its own season by $+0.253$ rating points on
+average and does so 72.6\% of the time; the season premiere is slightly below
+its own season ($-0.040$, above baseline 43.3\%); and the series finale beats
+its final-season body by $+0.256$, 71.6\% of the time
+($n = 3{,}082$ series). Figure~\ref{fig:finale} plots all three.
 
 Finales are systematically the strongest episode of their season, premieres are
 mildly below average, and the asymmetry is large. Only 9.4\% of series finales
@@ -342,8 +344,7 @@ flop'' is a one-in-ten event.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig04_final_season_curse.png}
-\caption{Distribution of $\Delta$ for ended series, with a sensitivity sweep
-over the ``cursed'' threshold.}
+\caption{Distribution of $\Delta$ for the $2{,}710$ ended series, with a sensitivity sweep over the ``cursed'' threshold. The black rule marks $\Delta = -0.5$, which 12.6\% of ended series fall below. The axis is clipped to $\pm 3$ points, leaving 6 series outside it.}
 \end{figure}
 
 Across 2,710 ended series, 50.6\% have a weaker final season and 49.4\% a
@@ -367,7 +368,7 @@ mechanical---a late crash necessarily tilts a fitted line downward.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig05_era_length_genre.png}
-\caption{OLS coefficients with 95\% confidence intervals.}
+\caption{OLS coefficients with 95\% confidence intervals, $n = 3{,}234$. A coloured dot marks $|t| > 2$; grey marks an estimate not distinguishable from zero. Era is shown per decade for comparability with the per-season length effect; the model itself is per year. Full table in Appendix~\ref{app:ols}.}
 \end{figure}
 
 Raw cross-sectional cuts are heavily confounded: median seasons per series
@@ -399,8 +400,7 @@ age, length and genre comes close to determining its trajectory.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig06_trajectory_shapes.png}
-\caption{Share of series by trajectory shape and the mean fitted arc of each
-class.}
+\caption{Share of series by trajectory shape, and the mean fitted arc of each class after centring on the series' own mean rating. The straight-line class contains both rising and falling series, so its average is their net. Class shares move by less than one point across curvature cut-offs from 0 to 0.20; roughly a fifth of the found-itself class rests on thinly-voted late episodes (Section~\ref{sec:robust}).}
 \end{figure}
 
 The rise-then-fall arc is the single most common shape (\textbf{44.6\%}),
@@ -417,7 +417,7 @@ vertex, not the size of $c$.
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{fig07_peak_location.png}
-\caption{Location of the best season by series length.}
+\caption{Location of the best season. Left: mean best season by run length, all $3{,}234$ series. Centre: share of series peaking in each third of their run, restricted to the 915 series with at least five seasons, where thirds are meaningful. Right: how often the first and the last season is the single best, all series.}
 \end{figure}
 
 The mean best season rises with run length (1.6 at two seasons, 2.5 at four,
@@ -433,6 +433,7 @@ only because the ends balance. Finally, the last season is the single best
 season 37.2\% of the time against 27.1\% for the first, contradicting the
 ``first season is always best'' claim in aggregate.
 
+\FloatBarrier
 \section{Robustness and threats to validity}
 \label{sec:robust}
 
@@ -482,6 +483,7 @@ Section~\ref{sec:model} holds each fixed, and both era and length survive. We
 additionally verified the era effect within ended series and within a fixed
 2--3-season band, where it does not fade.
 
+\FloatBarrier
 \section{Limitations}
 
 \paragraph{Ratings are not quality.}
@@ -516,6 +518,7 @@ Requiring at least 50 mean votes per episode excludes obscure series, so
 results generalise to series with a measurable audience rather than to all
 television.
 
+\FloatBarrier
 \section{Conclusion}
 
 The proposition that television series decline over their run is not supported
