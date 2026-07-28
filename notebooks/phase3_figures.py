@@ -604,7 +604,10 @@ def fig07_peak_location():
     ax1.bar(range(len(labels_x)), abs_means, width=0.6, color=BLUE,
             edgecolor=SURFACE, linewidth=0.6)
     for i, v in enumerate(abs_means):
-        ax1.text(i, v + 0.09, f"{v:.1f}", ha="center", fontsize=9, color=INK_2)
+        # Seven bars in a narrow panel: at paper size the neighbouring labels
+        # for the 6- and 7-season bars all but touch, so they set a size down.
+        ax1.text(i, v + 0.09, f"{v:.1f}", ha="center",
+                 fontsize=wording(9, 8), color=INK_2)
     ax1.set_xticks(range(len(labels_x)))
     ax1.set_xticklabels(labels_x)
     ax1.set_xlabel("How many seasons the show ran")
