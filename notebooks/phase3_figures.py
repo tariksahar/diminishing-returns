@@ -264,8 +264,9 @@ def fig03_finale_premium():
     ax1.barh(ypos, means, height=0.4, color=[BLUE if m >= 0 else RED for m in means],
              edgecolor=SURFACE, linewidth=0.6)
     ax1.axvline(0, color=AXIS, linewidth=0.8)
+    gap = wording(0.012, 0.022)  # larger text on the paper canvas needs more clearance
     for y, m in zip(ypos, means):
-        ax1.text(m + (0.012 if m >= 0 else -0.012), y, f"{m:+.2f}",
+        ax1.text(m + (gap if m >= 0 else -gap), y, f"{m:+.2f}",
                  va="center", ha="left" if m >= 0 else "right",
                  fontsize=10, color=INK_2)
     ax1.set_yticks(ypos)
@@ -273,7 +274,7 @@ def fig03_finale_premium():
     # The negative bar's value label is drawn to its left; on the paper canvas
     # that text is larger, so the axis needs more room or it lands on the
     # category labels outside the plot.
-    ax1.set_xlim(wording(-0.1, -0.17), 0.32)
+    ax1.set_xlim(wording(-0.1, -0.20), 0.32)
     ax1.set_xlabel("Average rating premium (points)")
     fs.panel_title(ax1, wording("How much better than the rest",
                               "Mean premium"))
@@ -289,7 +290,7 @@ def fig03_finale_premium():
     ax2.text(50.8, ypos[0] + wording(0.38, 0.24), "coin flip",
              color=INK_2, fontsize=9, va="bottom")
     for y, p in zip(ypos, pcts):
-        ax2.text(p + 1, y, f"{p:.1f}%", va="center", ha="left",
+        ax2.text(p + wording(1, 2.2), y, f"{p:.1f}%", va="center", ha="left",
                  fontsize=10, color=INK_2)
     ax2.set_yticks(ypos)
     ax2.set_yticklabels([])
@@ -363,7 +364,10 @@ def fig04_final_season_curse():
              markersize=8, markerfacecolor=RED, markeredgecolor=SURFACE,
              markeredgewidth=2)
     for i, (t, v) in enumerate(zip(thresholds, sweep)):
-        ax2.text(i, v + 1.6, f"{v:.1f}%", ha="center", fontsize=9.5, color=INK_2)
+        # The label clears the marker by a fixed data offset; on the paper canvas
+        # the text is twice the size relative to the axes, so it needs more room.
+        ax2.text(i, v + wording(1.6, 2.8), f"{v:.1f}%", ha="center",
+                 fontsize=9.5, color=INK_2)
     ax2.set_xticks(range(len(thresholds)))
     ax2.set_xticklabels([f"{t}" for t in thresholds])
     ax2.set_ylim(0, 36)

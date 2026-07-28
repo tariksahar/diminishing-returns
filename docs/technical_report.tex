@@ -21,6 +21,8 @@
 % Keeps each section's floats inside that section instead of letting them queue
 % up and land three-to-a-page with no text between them.
 \usepackage{placeins}
+% \captionof outside a float (appendix table).
+\usepackage{capt-of}
 
 % Find the figures whether they sit next to the .tex or in a folder. The paper/
 % plates come first: same data as the essay figures, but with no in-image title
@@ -97,6 +99,7 @@ replication.
 \FloatBarrier
 \section{Data}
 
+\FloatBarrier
 \subsection{Source}
 
 All ratings come from the IMDb public datasets~\cite{imdb}, downloaded on
@@ -108,6 +111,7 @@ to its parent series, season and episode number), \texttt{title.ratings} (mean
 rating and vote count per title) and \texttt{title.basics} (title type,
 primary title, start year, end year, genres).
 
+\FloatBarrier
 \subsection{Construction}
 
 Episodes with a missing season or episode number are dropped, since ordering
@@ -119,6 +123,7 @@ a within-show sequential index is assigned. Series with an empty end year are
 flagged as ongoing rather than dropped. The result is one row per rated
 episode.
 
+\FloatBarrier
 \subsection{Inclusion criteria}
 
 Six filters define the analysis population (Table~\ref{tab:incl}).
@@ -145,6 +150,7 @@ Documentary cap & kept only if $<100$ episodes & separates season-based series f
 The documentary rule is platform-independent, since the data carry no channel
 or platform field.
 
+\FloatBarrier
 \subsection{Sample}
 
 Table~\ref{tab:sample} describes the resulting panel.
@@ -180,6 +186,7 @@ right (Section~\ref{sec:cross}).
 \FloatBarrier
 \section{Methods}
 
+\FloatBarrier
 \subsection{Per-show trajectory}
 \label{sec:traj}
 
@@ -227,6 +234,7 @@ lets the heavily-voted final-season cluster set the trend for the whole run;
 the single most-voted episode is in fact a mid-run 9.9.}
 \end{figure}
 
+\FloatBarrier
 \subsection{Final-season effect}
 \label{sec:delta}
 
@@ -243,6 +251,7 @@ ended series only,
 and use $\Delta$ for all final-season claims. A series is termed \emph{clearly
 cursed} if $\Delta \le -0.5$.
 
+\FloatBarrier
 \subsection{Trajectory shape}
 \label{sec:shape}
 
@@ -255,6 +264,7 @@ and is monotone over it. Note this last class is not ``flat'': it contains
 steep monotone decliners and risers alike. Volatility is the weighted RMSE of
 the linear fit's residuals.
 
+\FloatBarrier
 \subsection{Peak location}
 
 For each series we take the argmax of season means, reported both as an
@@ -263,6 +273,7 @@ $(\mathrm{rank}-1)/(n_{\text{seasons}}-1)$. Because the sample is dominated by
 short series, aggregate statements about the peak are reported stratified by
 season count.
 
+\FloatBarrier
 \subsection{Cross-sectional model}
 \label{sec:model}
 
@@ -291,6 +302,7 @@ hues that had been used together.
 \FloatBarrier
 \section{Results}
 
+\FloatBarrier
 \subsection{The distribution of trajectories}
 
 \begin{figure}[htbp]
@@ -306,6 +318,7 @@ clearly, 57.4\% are essentially flat, and 25.7\% rise clearly}. Under the folk
 belief we would expect a distribution massed below zero; we observe a
 distribution massed \emph{at} zero with a mild positive tilt.
 
+\FloatBarrier
 \subsection{Stability across a series' run}
 \label{sec:halves}
 
@@ -327,6 +340,7 @@ exists---but it is very small. In levels, top-quartile starters (first-half
 mean 8.32) lose \textbf{0.07} rating points in their second half, and
 bottom-quartile starters (6.94) gain 0.07.
 
+\FloatBarrier
 \subsection{Finale structure}
 
 \begin{figure}[htbp]
@@ -351,6 +365,7 @@ mildly below average, and the asymmetry is large. Only 9.4\% of series finales
 fall 0.5 points or more below their final season---the memorable ``finale
 flop'' is a one-in-ten event.
 
+\FloatBarrier
 \subsection{The final-season effect}
 
 \begin{figure}[htbp]
@@ -375,6 +390,7 @@ cliff'' case is essentially absent: all 32 series with $\Delta \le -1.0$ and at
 least 30,000 votes also have a negative overall slope, which is
 mechanical---a late crash necessarily tilts a fitted line downward.
 
+\FloatBarrier
 \subsection{Era, length and genre}
 \label{sec:cross}
 
@@ -408,6 +424,7 @@ residual SD 0.756). The effects are estimated precisely but are small relative
 to the idiosyncratic differences between series; no combination of a show's
 age, length and genre comes close to determining its trajectory.
 
+\FloatBarrier
 \subsection{Shape and peak location}
 
 \begin{figure}[htbp]
@@ -611,11 +628,10 @@ genre indicators. $n = 3{,}234$, $R^2 = 0.0603$, residual SD 0.756. Premiere
 year is centred; the genre reference category is ``not carrying that genre''.
 Table~\ref{tab:ols} reports every coefficient.
 
-\begin{table}[htbp]
-\centering
+\begin{center}
 \small
-\caption{Full cross-sectional model. ``Series'' counts how many series carry
-each genre tag; genres are non-exclusive.}
+\captionof{table}{Full cross-sectional model. ``Series'' counts how many series
+carry each genre tag; genres are non-exclusive.}
 \label{tab:ols}
 \begin{tabular}{lrrrr}
 \toprule
@@ -644,7 +660,7 @@ Documentary               & $-0.2345$ & 0.0858 & $-2.73$ & 101 \\
 Biography                 & $-0.2436$ & 0.1083 & $-2.25$ & 53 \\
 \bottomrule
 \end{tabular}
-\end{table}
+\end{center}
 
 \section{Reproduction}
 
