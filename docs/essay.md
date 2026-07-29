@@ -1,4 +1,6 @@
-# Do TV Shows Really Decline?
+# Your Favourite Show Probably Didn't Decline
+
+### What 192,720 episode ratings say about television's most durable complaint
 
 > Every number in this piece is backed by the analysis logged in
 > [`decisions.md`](decisions.md). The formal write-up, with methods and full

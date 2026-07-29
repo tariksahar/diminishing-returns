@@ -27,9 +27,9 @@ in shows that ran too long, and in shows that are simply old.
 
 ## Read it
 
-- **[The essay](docs/report_draft.md)** — the full argument in plain language,
-  with all nine figures. Start here.
-  *(Draft: the analysis is final, the prose is still being tightened.)*
+- **[The essay](docs/essay.md)** — *Your Favourite Show Probably Didn't
+  Decline*: the full argument in plain language, with all nine figures. Start
+  here.
 - **[The technical report](docs/technical_report.md)** — the same findings in
   formal form: abstract, data, methods, results with confidence intervals,
   robustness checks, limitations, and the full regression table.

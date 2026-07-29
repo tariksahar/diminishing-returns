@@ -2,7 +2,7 @@
 
 **Tarık Şahar** · Istanbul Technical University, Data Science and Analytics
 Data snapshot: 22 July 2026 · Companion to the narrative essay in
-[`report_draft.md`](report_draft.md); all design decisions are logged in
+[`essay.md`](essay.md); all design decisions are logged in
 [`decisions.md`](decisions.md).
 
 ---

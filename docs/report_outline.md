@@ -11,7 +11,7 @@ Reliability tiers (from the Phase 2 review):
 - 🔵 methodological: belongs in the "how we know this is trustworthy" section
 
 Language: English (decided). **Deliverables: TWO** — (1) this engaging essay
-(`report_draft.md`), the public-facing hook; (2) a formal technical report
+(`essay.md`), the public-facing hook; (2) a formal technical report
 (abstract / data & methods / results / figures / references), to demonstrate
 rigor. This outline drives the essay.
 
@@ -159,10 +159,11 @@ is hard to follow without seeing the three fitted lines.
 1. ~~Overall decline/rise headline %~~ DONE — see §2 (42.6% down / 57.4% up;
    16.9% clear decline). Prior slopes file confirmed sqrt-weighted.
 2. ~~Decide final-narrative language~~ DONE — English (repo standard;
-   international-employer reach). Draft lives in `docs/report_draft.md`.
+   international-employer reach). It lives in `docs/essay.md`, titled
+   *Your Favourite Show Probably Didn't Decline*.
 3. ~~Decide which figures become final (polish pass)~~ DONE — see the table
    above.
-4. ~~Place figure callouts in `report_draft.md` prose~~ DONE — all nine
+4. ~~Place figure callouts in the essay's prose~~ DONE — all nine
    embedded with numbered captions. Reading order matches the file numbering
    (fig01…fig09), so no renumbering is needed as the prose moves around;
    fig08 sits in §7 rather than §1 to keep that alignment.
