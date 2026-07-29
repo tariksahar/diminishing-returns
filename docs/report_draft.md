@@ -8,8 +8,8 @@
 
 Think of a show you loved that stayed on too long.
 
-Got one? Now the uncomfortable question, and be honest, because your memory has
-a stake in the answer. Was that show *actually* worse by the end? Did the
+Got one? Now the uncomfortable question — and be honest, because your memory
+has a stake in the answer. Was that show *actually* worse by the end? Did the
 writing genuinely rot, the characters flatten, the spark drain out of it? Or
 did the ending simply let you down, and does a fresh disappointment shout
 louder than the dozens of quiet, good episodes that earned your love in the
@@ -36,8 +36,9 @@ have its whole life in a single number: how much it gained or lost between the
 pilot and the finale. Do that for all 3,234 shows and the belief falls apart on
 the very first count:
 
-- A *clear* decline, meaning at least half a rating point given up across the
-  whole run, turns up in just **16.9%** of shows. Fewer than one in six.
+- A *clear* decline, meaning the show gives up at least half a rating point
+  across its whole run, turns up in just **16.9%** of shows. Fewer than one in
+  six.
 - The largest group by far, **57.4%**, is essentially flat: no real rise, no
   real fall.
 - **25.7%** clearly rise, judged by that same half-point bar. Climbers
@@ -69,8 +70,8 @@ second half, with no shared episodes, so nothing is being compared with itself.
 The cloud hugs the line of no change, and the panel beside it shows how little
 even the extremes move.
 
-Which leaves a puzzle. If the numbers are this clear, why is everyone,
-including you thirty seconds ago, so sure that shows fall apart?
+Which leaves a puzzle. If the numbers are this clear, why is *everyone* —
+including you, thirty seconds ago — so sure that shows fall apart?
 
 That gap is the real story. Here's where it comes from.
 
@@ -91,9 +92,9 @@ season premiere is thoroughly unremarkable, no better than some random
 mid-season episode. Television builds toward endings; it doesn't coast away
 from beginnings.
 
-The very last episode a show ever airs plays by the same rule. It lands *above*
-its final season's average **71.6%** of the time. Only about **one in ten**
-finales falls hard enough to count as a real collapse.
+A show's very last episode plays by the same rule. It lands *above* its final
+season's average **71.6%** of the time. Only about **one in ten** finales falls
+hard enough to count as a real collapse.
 
 ![Bar chart comparing season finales, season premieres and series finales against the rest of their season.](../figures/fig03_finale_premium.png)
 
@@ -103,8 +104,8 @@ episode a show ever airs behaves like every other finale: it goes out high.
 
 That one in ten is simply the one you remember. *Dexter*, *How I Met Your
 Mother*, *Power*, *You*, *Veronica Mars* — the infamous flops are real, and the
-data registers every one of them. *How I Met Your Mother* spent its last season
-around a 7.6, then signed off at a 5.5. But for every one of those, there's a
+data registers every one of them. The last of *How I Met Your Mother* ran around
+a 7.6, and then it signed off at a 5.5. But for every one of those, there's a
 handful that leave the way *The Office*, *The Big Bang Theory*, *Brooklyn
 Nine-Nine*, and *Star Trek: The Next Generation* did, each closing on an
 episode rated a full two points above the season around it, the audience on its
@@ -321,9 +322,10 @@ writing:
   **down 4.2 points**, far past the 2.6 that made *Game of Thrones* infamous.
   Its lead actor was written out amid scandal and the last season was rebuilt
   without him.
-- *Top Gear* didn't run out of ideas either. Its presenting team left after
-  Jeremy Clarkson was fired in 2015, and what happened next shows up in our
-  numbers as a two-point drop, one of the largest we measured.
+- *Top Gear* didn't run out of ideas either. Its star, Jeremy Clarkson, punched
+  a producer in 2015 and was fired; his two co-hosts left with him, and what
+  followed shows up in our numbers as a two-point drop, one of the largest we
+  measured.
 - *Two and a Half Men* lost its lead the same way, when Charlie Sheen was fired
   mid-feud, and no amount of Ashton Kutcher held the room.
 - *Scrubs* "declined" in its ninth season only because it had quietly become a
