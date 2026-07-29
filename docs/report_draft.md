@@ -167,8 +167,9 @@ before 2000 mostly trend downward over their run, while nearly everything since
 trends up. The split holds even after you account for length, so it isn't
 simply that old shows ran longer. Why is harder to answer, and here we are
 guessing rather than measuring. The modern hit is short, serialized, and
-plotted end to end, engineered to build toward a payoff. The classic network show was episodic
-and open-ended, built to run forever. Forever tends to plateau, then sag.
+plotted end to end, engineered to build toward a payoff. The classic network
+show was episodic and open-ended, built to run forever. Forever tends to
+plateau, then sag.
 
 **And genre?** Mostly a red herring. Hold age and length constant and the giants
 of the schedule, drama and comedy and crime and action, come out flat, none of
