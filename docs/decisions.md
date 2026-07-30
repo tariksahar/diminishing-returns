@@ -43,8 +43,8 @@ Rationale, in short:
    `ongoing` boolean added in build. Ongoing shows are excluded from the
    final-season-curse analysis (`data/processed/_phase2_finalseason_full.json`,
    2,710 ended shows only). Finding: no systematic curse — 50.6% of ended
-   shows have a lower-than-usual final season, 49.4% higher, median delta
-   ≈ 0.00. Only 12.6% show a clear curse (final season ≥0.5 points below the
+   shows have a lower-than-usual final season, 49.2% higher (six exactly
+   level), median delta ≈ 0.00. Only 12.6% show a clear curse (final season ≥0.5 points below the
    rest), and those are disproportionately well-known flops (House of Cards
    -4.24, Game of Thrones -2.55, Master of None -2.54) — likely why the
    "final season curse" feels universal (availability bias) even though it
@@ -707,6 +707,65 @@ hit that failure twice during drafting, when an older `.tex` was compiled by
 mistake and the mismatch had to be caught by diffing the output against the
 source. Do not commit intermediate compiles — only when the source meaningfully
 changes.
+
+## Tests: the conventions this project relied on, made enforceable
+
+Added at the end, which is late, and the lateness is the point worth recording.
+
+The README claims a figure "cannot quietly drift away from the numbers in the
+text", because every figure recomputes its own inputs and prints them. That was
+true, and it was still only a habit — nothing checked it. The same held for the
+palette rule in `figstyle.py` ("HARD RULE: ORANGE and RED must never appear in
+the same figure"), which is a comment, and which the first version of fig02
+broke anyway. Habits and comments do not survive a change made six months later
+by someone who did not write them.
+
+Three files under `tests/`, runnable with `pytest` from the repository root:
+
+- `test_build_contract.py` — what every analysis assumes about
+  `episodes.parquet` and never states: the 3,234 / 192,720 population, the
+  column list, no nulls in anything a `groupby` touches, ratings inside IMDb's
+  own 1-10 range, and `overall_order` dense and 1-based within each show (the
+  0-1 normalisation is only correct if it is). It also re-checks all six
+  inclusion filters against the output rather than trusting the build log.
+- `test_headline_numbers.py` — every figure in the README's findings table,
+  recomputed from the parquet: the 16.9 / 57.4 / 25.7 split, the +0.109 median,
+  the +0.79 halves correlation and the 0.07 top-quartile give-back, the 72.6%
+  and 71.6% finale premiums, the final-season split, and the -0.026 / +0.0048
+  length and era coefficients. Plus the one that guards everything downstream:
+  the stored `_phase2_slopes_full.json` must still match a fresh recompute.
+- `test_figure_palette.py` — parses `phase3_figures.py` as a syntax tree and
+  fails if any figure function references both ORANGE and RED. Static, so it
+  cannot see a colour reached indirectly; every figure names its colours
+  directly today, and that is the habit being locked in.
+
+Tests run against the committed `data/processed/`, so a fresh clone can verify
+every published number without downloading the 274 MB of raw IMDb dumps.
+`pytest` is in `requirements-dev.txt`, not `requirements.txt` — the latter stays
+the minimum needed to run the analysis.
+
+### What the first run caught: the final-season split was 49.4%, and it is 49.2%
+
+`phase2_finalseason.py` counted the risers as `len(res) - declining` instead of
+counting them, which folds the **six ended series whose final season lands
+exactly level** with the rest of their run into the "stronger" column. So the
+published pair did sum to 100 — by absorbing the ties.
+
+Corrected to 50.6% / 49.2% / six level, in the script, the README, the essay,
+the outline, the technical report and this log. Nothing downstream moves: the
+finding was "almost exactly even" and it still is, the 12.6% clear-curse share
+is untouched, and no figure plotted the number.
+
+It is worth being clear about how small this is, and about why it was still
+worth chasing. Six series in 2,710, 0.2 of a percentage point, and no
+conclusion depends on it. But §7 of the essay makes an argument about exactly
+this class of mistake — "headline findings get scrutinised; it's the confident
+little sentences *around* them where mistakes survive" — and the error was a
+derived-instead-of-counted share sitting one line away from a headline. The
+essay had already been through a verification pass over its named-show claims;
+this number was never in that pass because it did not look like a claim. That
+is the case for tests over care: care is what checks the things that look like
+they need checking.
 
 ## Language convention
 

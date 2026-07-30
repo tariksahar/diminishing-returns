@@ -1,0 +1,9 @@
+# Development-only dependencies. requirements.txt stays the minimum needed to
+# run the analysis; a test runner does not belong in it.
+#
+#   pip install -r requirements.txt -r requirements-dev.txt
+#   pytest
+
+-r requirements.txt
+
+pytest~=9.0

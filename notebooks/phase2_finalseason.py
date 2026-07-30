@@ -46,9 +46,15 @@ print("=== OVERALL PICTURE (final-season mean - rest-of-show mean) ===")
 print(f"mean delta:   {res['delta'].mean():+.3f}")
 print(f"median delta: {res['delta'].median():+.3f}")
 print()
+# Count each direction directly. Deriving "higher" as len(res) - declining
+# silently folds exact ties into the risers, which is how the published 49.4%
+# came to be 0.2 points too high.
 declining = (res["delta"] < 0).sum()
-print(f"final season LOWER than the rest: {declining:,}  ({100*declining/len(res):.1f}%)")
-print(f"final season HIGHER than the rest: {len(res)-declining:,}  ({100*(len(res)-declining)/len(res):.1f}%)")
+rising = (res["delta"] > 0).sum()
+level = (res["delta"] == 0).sum()
+print(f"final season LOWER than the rest:  {declining:,}  ({100*declining/len(res):.1f}%)")
+print(f"final season HIGHER than the rest: {rising:,}  ({100*rising/len(res):.1f}%)")
+print(f"exactly level:                     {level:,}  ({100*level/len(res):.1f}%)")
 print()
 strong_curse = (res["delta"] <= -0.5).sum()
 mild_curse = ((res["delta"] < 0) & (res["delta"] > -0.5)).sum()

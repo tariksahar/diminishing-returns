@@ -21,7 +21,7 @@ expects a collapse — the finale — is usually a show's *peak*.
 | "Shows decline over time" | Only **16.9%** clearly decline. **57.4%** are essentially flat, **25.7%** clearly rise. |
 | "A show's quality drains away" | A show's second half lands within **0.07** of a rating point of its first half, even for the strongest starters. |
 | "Finales ruin everything" | Season finales beat the rest of their season **72.6%** of the time. Series finales rise **71.6%** of the time. |
-| "The final season is cursed" | Almost a coin flip: **50.6%** down, **49.4%** up. Only **12.6%** lose half a point or more. |
+| "The final season is cursed" | Almost a coin flip: **50.6%** down, **49.2%** up. Only **12.6%** lose half a point or more. |
 | "It depends on the genre" | Genre barely matters. **Age and length** do: every extra season costs **0.026** of a rating point, every decade newer adds **0.048**. |
 | "The first season is always best" | The **last** season is the single best more often (**37%**) than the first (**27%**). |
 
@@ -94,6 +94,17 @@ pip install -r requirements.txt
    nine figures into `figures/`.
 
 Every script is run from the repository root.
+
+**Checking it.** The published numbers are covered by a test suite that
+recomputes them from `data/processed/` — the population and the inclusion
+filters, every figure in the findings table above, and the palette rule that
+keeps two indistinguishable colours out of the same chart. It runs against the
+committed processed data, so it works on a fresh clone without the raw dumps:
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
 
 **One caveat on exact reproduction.** IMDb republishes these files daily, and
 every number here comes from the snapshot downloaded on **22 July 2026**.

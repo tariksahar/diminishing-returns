@@ -135,7 +135,7 @@ averaging a 6.4 against a 9.0 for everything that came before.
 
 To test it we took every show that has actually finished and set its final
 season against the rest of its run. The result comes out almost exactly even.
-**50.6%** have a weaker final season, **49.4%** a stronger one, and the middle
+**50.6%** have a weaker final season, **49.2%** a stronger one, and the middle
 of the pack moves by essentially nothing. There is no curse. On average, a
 final season is just another season.
 

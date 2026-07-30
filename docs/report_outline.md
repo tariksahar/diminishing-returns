@@ -65,7 +65,7 @@ declines."*
   Office, Brooklyn 99, TNG).
 
 ## 4. The "final season curse" — mostly a myth  [🟢 + 🟡 caveat]
-- Ended shows split 50.6% down / 49.4% up, median ≈ 0; only 12.6% a clear
+- Ended shows split 50.6% down / 49.2% up, median ≈ 0; only 12.6% a clear
   curse. Robust to threshold sweep and effect-size. (finding #4)
 - The cursed minority is dominated by very famous shows (GoT -2.55, Master
   of None -2.54, The Promised Neverland -2.28). House of Cards is the single

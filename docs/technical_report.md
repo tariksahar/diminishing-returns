@@ -275,8 +275,9 @@ finales fall 0.5 points or more below their final season — the memorable
 **Figure 6.** Distribution of $\Delta$ for ended series, with a sensitivity
 sweep over the "cursed" threshold.
 
-Across 2,710 ended series, 50.6% have a weaker final season and 49.4% a
-stronger one, with median $\Delta = -0.006$ and mean $-0.049$. **12.6%** are
+Across 2,710 ended series, 50.6% have a weaker final season and 49.2% a
+stronger one (six end exactly level), with median $\Delta = -0.006$ and mean
+$-0.049$. **12.6%** are
 clearly cursed at the -0.5 cut. The cursed minority is dominated by
 well-known series (*House of Cards* -4.24, *Game of Thrones* -2.55, *Master of
 None* -2.54, *The Promised Neverland* -2.28), which we read as the mechanism
