@@ -1,0 +1,11 @@
+# Line endings are normalised to LF inside the repository and checked out with
+# the platform's convention. Without this the behaviour depends on each
+# machine's core.autocrlf setting, which is how a repo ends up with the same
+# file committed twice under two different endings.
+* text=auto eol=lf
+
+# Binary: never touched, never diffed as text.
+*.png   binary
+*.pdf   binary
+*.parquet binary
+*.gz    binary
