@@ -375,8 +375,9 @@ to readers whose browser reports a dark preference:
 
 ```html
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig01.png">
-  <img alt="…" src="../figures/fig01.png">
+  <source media="(prefers-color-scheme: dark)"
+          srcset="../figures/dark/fig01_slope_distribution.png">
+  <img alt="…" src="../figures/fig01_slope_distribution.png">
 </picture>
 ```
 
