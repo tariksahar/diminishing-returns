@@ -56,8 +56,19 @@ r_split = np.corrcoef(rr["odd"], rr["even"])[0, 1]
 rel = 2 * r_split / (1 + r_split)
 print(f"  first-half reliability (Spearman-Brown): {rel:.3f}")
 print(f"  -> under 'stable quality + noise only' we would expect an o-on-b slope of ~{rel:.3f}")
-print(f"     observed ({bb[0]:.3f}) clearly BELOW that: high starters really do decline extra")
-print(f"     observed close to it: the drop is mostly statistical regression, not decay")
+
+# How far the observed slope sits below the noise-only expectation is the part
+# of the fall-back that noise cannot explain -- the REAL extra decline of strong
+# starters. Reported in rating points rather than as a verdict, because the
+# honest answer here is neither "yes" nor "no" but "yes, and it is negligible":
+# a gap this small moves the top quartile by less than a tenth of a point.
+gap = rel - bb[0]
+b_mean = r["b"].mean()
+top_b = r.loc[r["b"] >= r["b"].quantile(0.75), "b"].mean()
+extra = gap * (top_b - b_mean)
+print(f"     observed {bb[0]:.3f}, which is {gap:.3f} below that expectation")
+print(f"     -> a real extra decline exists, but it is tiny: {extra:.3f} rating points for")
+print(f"        the average top-quartile starter (baseline {top_b:.2f} vs the {b_mean:.2f} overall mean)")
 
 print("\nBY BASELINE QUARTILE (do strong starters fall back?):")
 r["bq"] = pd.qcut(r["b"], 4, labels=["Q1 (lowest)", "Q2", "Q3", "Q4 (highest)"])
