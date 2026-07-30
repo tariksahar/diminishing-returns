@@ -9,7 +9,10 @@ I tested that belief against **192,720 episode ratings from 3,234 shows**.
 group barely moves at all, more shows rise than fall, and the moment the belief
 expects a collapse — the finale — is usually a show's *peak*.
 
-![Distribution of every show's overall rating trend](figures/fig01_slope_distribution.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/dark/fig01_slope_distribution.png">
+  <img alt="Distribution of every show's overall rating trend" src="figures/fig01_slope_distribution.png">
+</picture>
 
 ## What the data says
 

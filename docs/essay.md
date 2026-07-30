@@ -49,7 +49,10 @@ the very first count:
   of the move and simply count directions, and it still tips that way: for
   every three shows that drift down, four drift up.
 
-![Distribution of every show's overall rating trend. The declining tail is small; the bulk of shows sit near zero change.](../figures/fig01_slope_distribution.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig01_slope_distribution.png">
+  <img alt="Distribution of every show's overall rating trend. The declining tail is small; the bulk of shows sit near zero change." src="../figures/fig01_slope_distribution.png">
+</picture>
 
 **Figure 1.** Every show's trend, first episode to last. The distribution is a
 hill sitting just to the right of zero. The declining tail is real, but it is a
@@ -65,7 +68,10 @@ top quarter averaging an 8.3, surrender a mere **0.07 of a point** by their
 back half. Whatever drama plays out inside a single season, a show's overall
 quality barely budges from beginning to end.
 
-![Scatter of each show's first-half mean rating against its second-half mean rating, clustered tightly along the line of no change.](../figures/fig02_halves_stability.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig02_halves_stability.png">
+  <img alt="Scatter of each show's first-half mean rating against its second-half mean rating, clustered tightly along the line of no change." src="../figures/fig02_halves_stability.png">
+</picture>
 
 **Figure 2.** Each show's first half plotted against its separately measured
 second half, with no shared episodes, so nothing is being compared with itself.
@@ -98,7 +104,10 @@ A show's very last episode plays by the same rule. It lands *above* its final
 season's average **71.6%** of the time. Only about **one in ten** finales falls
 hard enough to count as a real collapse.
 
-![Bar chart comparing season finales, season premieres and series finales against the rest of their season.](../figures/fig03_finale_premium.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig03_finale_premium.png">
+  <img alt="Bar chart comparing season finales, season premieres and series finales against the rest of their season." src="../figures/fig03_finale_premium.png">
+</picture>
 
 **Figure 3.** Season finales beat the rest of their own season nearly three
 times out of four; premieres are unremarkable by comparison. The very last
@@ -137,7 +146,10 @@ or more at the end. Look at who they are: *Game of Thrones*, down 2.5 points;
 collapses that launch a thousand angry threads. The curse is real. It is just
 rare — and it keeps landing on the shows people actually cared about.
 
-![Distribution of each ended show's final season compared with the rest of its run, centred almost exactly on zero, beside a threshold sweep.](../figures/fig04_final_season_curse.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig04_final_season_curse.png">
+  <img alt="Distribution of each ended show's final season compared with the rest of its run, centred almost exactly on zero, beside a threshold sweep." src="../figures/fig04_final_season_curse.png">
+</picture>
 
 **Figure 4.** Every ended show's final season, set against the rest of its run.
 The bulk of the distribution sits on zero; the curse is that red left tail, and
@@ -180,7 +192,10 @@ them cursed or blessed by their label. Only a couple of categories truly break
 from the pack: animation quietly climbs, those long-running cartoons and anime
 that sharpen with age, while documentary and biography fade.
 
-![Coefficient plot showing the effect of length, era and genre on a show's trend, with confidence intervals.](../figures/fig05_era_length_genre.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig05_era_length_genre.png">
+  <img alt="Coefficient plot showing the effect of length, era and genre on a show's trend, with confidence intervals." src="../figures/fig05_era_length_genre.png">
+</picture>
 
 **Figure 5.** One regression, every factor at once, so each effect is what
 remains after the others are held fixed. Length and age each survive that test.
@@ -201,7 +216,10 @@ about how. The single most common trajectory, about **45%** of shows, really is
 an arc: a climb to a peak, then a drift back down. It is the closest thing in
 the numbers to "jumping the shark."
 
-![Share of shows taking each trajectory shape, beside the average fitted arc of each shape.](../figures/fig06_trajectory_shapes.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig06_trajectory_shapes.png">
+  <img alt="Share of shows taking each trajectory shape, beside the average fitted arc of each shape." src="../figures/fig06_trajectory_shapes.png">
+</picture>
 
 **Figure 6.** The rise-then-fall arc is the single most common shape a run
 takes. Look at the vertical scale on the right, though: the entire arc plays
@@ -221,7 +239,10 @@ is always the best.* It usually isn't. Across our shows, the single strongest
 season is the *last* one more often (**37%**) than the *first* (**27%**). A
 show is likelier to save its best for the end than to open on it.
 
-![Where a show's best season falls, by how many seasons it ran.](../figures/fig07_peak_location.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig07_peak_location.png">
+  <img alt="Where a show's best season falls, by how many seasons it ran." src="../figures/fig07_peak_location.png">
+</picture>
 
 **Figure 7.** Where a show's best season falls. The peak drifts later the longer
 a show runs (left), yet it is not concentrated in the middle (centre), and the
@@ -250,7 +271,10 @@ That population is the whole essay, and behind every percentage in it sits a
 picture like this one: a few dozen episode ratings and a line drawn through
 them.
 
-![Episode ratings and fitted trends for Stranger Things, Friends and Breaking Bad.](../figures/fig08_example_trajectories.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig08_example_trajectories.png">
+  <img alt="Episode ratings and fitted trends for Stranger Things, Friends and Breaking Bad." src="../figures/fig08_example_trajectories.png">
+</picture>
 
 **Figure 8.** One show from each of the three groups in Figure 1. Every dot is
 an episode, sized by how many people voted on it; the line through them is the
@@ -267,7 +291,10 @@ its disappointment. Weight by raw votes and that late cluster hijacks the
 entire trend. We settled on the *square root* of the vote count, which trusts
 popular episodes more without letting one viral meltdown speak for a decade.
 
-![Game of Thrones episode ratings with three trend lines fitted under three different vote-weighting schemes.](../figures/fig09_weighting_choice.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig09_weighting_choice.png">
+  <img alt="Game of Thrones episode ratings with three trend lines fitted under three different vote-weighting schemes." src="../figures/fig09_weighting_choice.png">
+</picture>
 
 **Figure 9.** The same 73 episodes, three ways of counting them. Weighting by
 raw votes gives the steepest line of the three: the final season's backlash

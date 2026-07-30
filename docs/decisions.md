@@ -367,7 +367,40 @@ Consistency this buys: the sqrt-weighted trend line is orange in every figure
 it appears in. An earlier version drew that same estimator orange in fig08 but
 blue in fig09, which would have made the two figures hard to read together.
 
-### Dark mode — DEFERRED to packaging, not dropped
+### Dark mode — DONE
+
+Built as a third render mode, `--dark`, alongside `--paper`. Nine dark plates in
+`figures/dark/`, and every markdown image is now a `<picture>` that serves them
+to readers whose browser reports a dark preference:
+
+```html
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig01.png">
+  <img alt="…" src="../figures/fig01.png">
+</picture>
+```
+
+The point worth recording, because it is the question that stalls people: **we
+never choose the theme.** The reader's own setting does, through the browser's
+`prefers-color-scheme`. Both files ship; each visitor's browser picks one. The
+`<img>` keeps the light file so anything that does not understand `<picture>`
+still shows a figure.
+
+Scope is narrower than it first looks. The dark set covers the essay and the
+README only. The technical report is a PDF, which has no theme, so the paper
+plates stay light — and `figstyle` enforces that: `--dark` is ignored when
+`--paper` is passed.
+
+One implementation note. The palette flag is read at import time rather than
+inside `apply_style()`, because `phase3_figures.py` binds the colours with
+`from figstyle import BLUE, …` before any function runs. Setting them later
+would leave the imported names pointing at the light values.
+
+This decision was originally recorded as deferred, with the reasoning below.
+The deferral held until the essay's own home was settled; the dark palette had
+already been validated at that point, so the work was only ever a flag away.
+
+### Why it was deferred first
 
 The figures are drawn on a light surface (`#fcfcfb`). Both primary deliverables
 are documents (the essay and an arXiv-style technical report), where light is

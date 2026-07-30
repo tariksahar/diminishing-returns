@@ -20,21 +20,47 @@ Two deliberate deviations from the palette defaults, both documented there:
     carries an identity on its own.
 """
 
+import sys
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 # --- palette -----------------------------------------------------------------
-SURFACE = "#fcfcfb"      # chart surface (the validator's light-mode surface)
-INK = "#0b0b0b"          # primary text
-INK_2 = "#52514e"        # secondary text
-MUTED = "#898781"        # axis labels, de-emphasised marks
-GRID = "#e1e0d9"         # hairline gridlines
-AXIS = "#c3c2b7"         # baseline / axis rule
+# Two validated sets of the same eight roles. The dark column is the reference
+# palette's own dark steps, not an inversion: re-checked against the dark
+# surface (#1a1a19) with the same Python port of the checker, where the trio
+# blue/orange/aqua passes all-pairs (worst CVD dE 9.4, normal-vision 20.9) and
+# the diverging poles pass at dE 19.2 / 29.0. The orange-red clash documented
+# below survives in dark mode too (normal-vision dE 7.1), so the role rule is
+# mode-independent.
+_LIGHT = {
+    "SURFACE": "#fcfcfb", "INK": "#0b0b0b", "INK_2": "#52514e",
+    "MUTED": "#898781", "GRID": "#e1e0d9", "AXIS": "#c3c2b7",
+    "BLUE": "#2a78d6", "ORANGE": "#eb6834", "AQUA": "#1baf7a", "RED": "#e34948",
+}
+_DARK = {
+    "SURFACE": "#1a1a19", "INK": "#ffffff", "INK_2": "#c3c2b7",
+    "MUTED": "#898781", "GRID": "#2c2c2a", "AXIS": "#383835",
+    "BLUE": "#3987e5", "ORANGE": "#d95926", "AQUA": "#199e70", "RED": "#e66767",
+}
 
-BLUE = "#2a78d6"         # categorical slot 1 / diverging "rise" pole
-ORANGE = "#eb6834"       # categorical slot 2
-AQUA = "#1baf7a"         # categorical slot 3 (always direct-labelled, see above)
-RED = "#e34948"          # diverging "decline" pole
+# The flag is read here, at import time, because phase3_figures.py binds these
+# names with `from figstyle import BLUE, ...` before any function runs. Paper
+# plates are always light: they go into a PDF, which has no theme.
+DARK = "--dark" in sys.argv and "--paper" not in sys.argv
+_P = _DARK if DARK else _LIGHT
+
+SURFACE = _P["SURFACE"]  # chart surface
+INK = _P["INK"]          # primary text
+INK_2 = _P["INK_2"]      # secondary text
+MUTED = _P["MUTED"]      # axis labels, de-emphasised marks
+GRID = _P["GRID"]        # hairline gridlines
+AXIS = _P["AXIS"]        # baseline / axis rule
+
+BLUE = _P["BLUE"]        # categorical slot 1 / diverging "rise" pole
+ORANGE = _P["ORANGE"]    # categorical slot 2
+AQUA = _P["AQUA"]        # categorical slot 3 (always direct-labelled, see above)
+RED = _P["RED"]          # diverging "decline" pole
 
 # Semantic aliases so the figure code reads in the language of the analysis.
 RISE, DECLINE, FLAT = BLUE, RED, MUTED
@@ -159,9 +185,9 @@ def frame(fig, title, subtitle=None, footnote=None, rect=(0.055, 0.085, 0.985, 0
 
 
 def save(fig, name):
-    """Write to figures/<name>.png (or figures/paper/ in PAPER mode)."""
+    """Write to figures/, or figures/paper/, or figures/dark/ by mode."""
     import os
-    folder = "figures/paper" if PAPER else "figures"
+    folder = "figures/paper" if PAPER else ("figures/dark" if DARK else "figures")
     os.makedirs(folder, exist_ok=True)
     path = f"{folder}/{name}.png"
     fig.savefig(path)
