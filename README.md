@@ -30,9 +30,11 @@ in shows that ran too long, and in shows that are simply old.
 - **[The essay](docs/essay.md)** — *Your Favourite Show Probably Didn't
   Decline*: the full argument in plain language, with all nine figures. Start
   here.
-- **[The technical report](docs/technical_report.md)** — the same findings in
-  formal form: abstract, data, methods, results with confidence intervals,
-  robustness checks, limitations, and the full regression table.
+- **[The technical report](docs/technical_report.pdf)** (PDF, 12 pages) — the
+  same findings in formal form: abstract, data, methods, results with
+  confidence intervals, robustness checks, limitations, references and the full
+  regression table. Source in [LaTeX](docs/technical_report.tex) and
+  [Markdown](docs/technical_report.md).
 - **[Decision log](docs/decisions.md)** — every methodological choice, why it
   was made, and the traps that were caught along the way. This is the honest
   record: the mistakes are in here too.

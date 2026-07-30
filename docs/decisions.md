@@ -603,6 +603,23 @@ middle panel is restricted to the 915 series with at least five seasons.
 - **Table widths** were recomputed for the narrower measure; the old `p{}`
   values summed wider than the new text block and would have overflowed.
 
+### The compiled PDF is committed — and can go stale
+
+`docs/technical_report.pdf` is in the repository rather than left as a build
+artifact. The usual rule against committing build output assumes something that
+changes often and is cheap to rebuild; this is neither. The report is finished,
+and there is no LaTeX toolchain on this machine, so rebuilding means an Overleaf
+round trip. Without the PDF the technical report is effectively invisible: a
+visitor has no way to read `.tex`, while GitHub renders a PDF in the browser.
+
+**The rule that comes with it:** if `technical_report.tex` changes, the PDF must
+be recompiled and re-committed in the same change. A stale PDF is worse than no
+PDF, because it looks authoritative while being wrong. This project has already
+hit that failure twice during drafting, when an older `.tex` was compiled by
+mistake and the mismatch had to be caught by diffing the output against the
+source. Do not commit intermediate compiles — only when the source meaningfully
+changes.
+
 ## Language convention
 
 All code, comments, function/variable names, filenames and figure labels are in
