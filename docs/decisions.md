@@ -319,6 +319,60 @@ show's episodes into disjoint first/second halves.
   to the mean as a big explanation — properly measured it is nearly
   negligible.
 
+### Popularity: the belief describes the famous shows better than the average one
+
+Added after the report was finished, because a review pass asked a question the
+analysis had never cut on: the headline is a claim about the average show, but
+nobody forms the decline belief from the average show. §4 of the essay already
+answered this with availability bias, flagged there as interpretation rather
+than measurement. `phase2_popularity.py` checks whether it is measurable.
+
+Cutting the same sqrt(votes)-weighted slope by a series' total votes gives a
+monotone gradient:
+
+| Tier | n | Clear decline | Median slope |
+|---|---|---|---|
+| under 5k votes | 1,184 | 14.8% | +0.224 |
+| 5k - 50k | 1,545 | 15.1% | +0.078 |
+| 50k - 500k | 445 | 24.7% | -0.041 |
+| over 500k (household names) | 60 | **43.3%** | **-0.392** |
+
+The top tier declines at roughly three times the 16.9% base rate. Three checks
+were run to try to make that go away, and none did:
+
+- **Not a precision artifact.** A noisier slope crosses a fixed ±0.5 threshold
+  more often by luck, so if obscure series had much noisier fits the gradient
+  could be manufactured by measurement error alone. Refitting with the slope's
+  standard error shows precision is essentially flat across tiers (median SE
+  0.207 / 0.174 / 0.191 / 0.205) — popular series have less noise per episode
+  but genuinely bumpier ratings, and the two roughly cancel. Worth stating
+  because the intuition ("popular = better measured") is wrong here, and was
+  checked rather than assumed.
+- **Not the length effect in disguise.** Popular series run longer
+  (corr(log votes, seasons) = 0.37) and long series were already shown to
+  decline. Holding the season band fixed, the gap survives in every band:
+  2-3 seasons 13.1% vs 31.0%, 4-5 seasons 15.1% vs 36.6%, 6+ seasons 23.2% vs
+  38.2% (obscure <20k votes vs popular >=200k).
+- **Survives era and length jointly.** OLS of slope on log10(votes) +
+  n_season + start_year: log-votes -0.134 (t = -6.2), larger in magnitude than
+  a whole extra season (-0.019) and estimated as sharply.
+
+**The caveat that must travel with this, and the reason it stays out of the
+headline: vote count is endogenous.** This project documented the mechanism
+itself while choosing a weighting scheme — a final-season backlash inflates
+vote counts, which is why four of Game of Thrones' six most-voted episodes are
+season-8 ones. Decline raises votes as surely as votes track decline, so the
+arrow cannot be pointed and **no causal claim is available here**. What
+survives is descriptive, and is still worth having: the series the belief is
+drawn from do not behave like the typical series, and "fewer than one in six"
+is not a statement about them.
+
+**Not yet reflected in the essay or the technical report.** Deliberately: §4's
+availability-bias paragraph is currently hedged as interpretation, and this
+result would let it be stated as measurement instead. That is a prose decision
+about the strongest section of the essay, and it is not being made in the same
+pass that produced the number. The finding is logged here first.
+
 ## Phase 3 decisions (figures)
 
 ### Colour is computed, not eyeballed
