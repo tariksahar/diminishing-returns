@@ -6,7 +6,13 @@
       the regression is unavoidable noise vs a real quality change.
   (2) Genre effect NET of era and length: OLS of the full-show sqrt-weighted
       slope on multi-hot genre dummies + start_year + n_season + ongoing.
+      Sixteen genre coefficients are tested at once, so a per-coefficient
+      |t| > 2 will flag roughly one genre by chance alone. Bonferroni and
+      Benjamini-Hochberg thresholds are computed alongside the raw ones so the
+      report can say which genres actually survive being one of sixteen tests.
 """
+
+import math
 
 import numpy as np
 import pandas as pd
@@ -108,19 +114,79 @@ se = np.sqrt(np.diag(sigma2 * XtX_inv))       # classical SEs
 tstat = beta / se
 names = ["intercept"] + cols
 
+
+# Two-sided p-values. With 3,214 residual degrees of freedom the t-distribution
+# is indistinguishable from the normal, so erfc gives the exact normal tail and
+# avoids a scipy dependency: p = 2*(1 - Phi(|t|)) = erfc(|t|/sqrt(2)).
+pvals = np.array([math.erfc(abs(t) / np.sqrt(2)) for t in tstat])
+
+# --- Multiplicity over the 16 genre coefficients ------------------------------
+# Era, length and ongoing are pre-specified single hypotheses and are not part
+# of the family; the genre dummies are the screen where the correction belongs.
+gi = [names.index(gn) for gn in GENRES]
+m = len(GENRES)
+alpha = 0.05
+bonf_alpha = alpha / m
+
+# Benjamini-Hochberg: sort the family's p-values, find the largest k whose
+# p_(k) <= k/m * alpha, and reject everything at or below it. Controls the false
+# DISCOVERY rate rather than the family-wise error rate, so it is less punishing
+# than Bonferroni while still accounting for the 16 tests.
+gp = sorted(((pvals[i], i) for i in gi))
+bh_cut = 0.0
+for k, (p, _) in enumerate(gp, start=1):
+    if p <= k / m * alpha:
+        bh_cut = p
+bh_survivors = {i for p, i in gp if p <= bh_cut}
+
 print(f"n = {len(d)} shows.  Coefficient = this genre's contribution to the slope,")
 print("with era and length held fixed.")
-print(f"{'variable':<14}{'coef':>10}{'std err':>10}{'t':>8}  significant?")
+print()
+print(f"{'variable':<14}{'coef':>10}{'std err':>10}{'t':>8}{'p':>10}  verdict")
 for nm in ["yr_c", "n_season", "ongoing_i"]:
     i = names.index(nm)
-    sig = "***" if abs(tstat[i]) > 2.6 else ("*" if abs(tstat[i]) > 2 else "")
-    print(f"  {nm:<12}{beta[i]:>10.4f}{se[i]:>10.4f}{tstat[i]:>8.1f}  {sig}")
-print("  --- genres (reference = shows NOT carrying that genre) ---")
+    sig = "significant" if pvals[i] < alpha else ""
+    print(f"  {nm:<12}{beta[i]:>10.4f}{se[i]:>10.4f}{tstat[i]:>8.1f}{pvals[i]:>10.2e}  {sig}")
+print()
+
+# The |t| a genre must reach under Bonferroni, found by bisecting the same
+# normal tail used for the p-values. Reported because the report and the
+# coefficient figure both speak in t-statistics, not p-values.
+lo, hi = 0.0, 10.0
+for _ in range(100):
+    mid = (lo + hi) / 2
+    if math.erfc(mid / np.sqrt(2)) > bonf_alpha:
+        lo = mid
+    else:
+        hi = mid
+bonf_t = (lo + hi) / 2
+
+print(f"  --- genres: {m} coefficients tested at once "
+      f"(reference = shows NOT carrying that genre) ---")
+print(f"  raw: alpha={alpha} (|t| > 1.96)   "
+      f"Bonferroni: alpha={bonf_alpha:.5f} (|t| > {bonf_t:.2f})   "
+      f"BH: reject p <= {bh_cut:.5f}")
 order = sorted(GENRES, key=lambda gn: beta[names.index(gn)])
 for gn in order:
     i = names.index(gn)
-    sig = "***" if abs(tstat[i]) > 2.6 else ("*" if abs(tstat[i]) > 2 else "")
-    print(f"  {gn:<12}{beta[i]:>10.4f}{se[i]:>10.4f}{tstat[i]:>8.1f}  {sig}")
+    marks = []
+    if pvals[i] < alpha:
+        marks.append("raw")
+    if i in bh_survivors:
+        marks.append("BH")
+    if pvals[i] < bonf_alpha:
+        marks.append("Bonferroni")
+    print(f"  {gn:<12}{beta[i]:>10.4f}{se[i]:>10.4f}{tstat[i]:>8.1f}{pvals[i]:>10.2e}"
+          f"  {', '.join(marks)}")
+print()
+n_raw = sum(1 for i in gi if pvals[i] < alpha)
+n_bh = len(bh_survivors)
+n_bonf = sum(1 for i in gi if pvals[i] < bonf_alpha)
+print(f"Genres passing: {n_raw} raw, {n_bh} after Benjamini-Hochberg, "
+      f"{n_bonf} after Bonferroni.")
+print(f"Expected false positives from {m} tests at raw alpha={alpha}: "
+      f"{m*alpha:.1f}. That is why the raw count cannot be reported alone --")
+print("the weakest genres on the list are exactly where that one lands.")
 print()
 print("Compare with the raw medians from phase2_deep.py: Animation +0.332,")
 print("Documentary -0.171. Coefficients smaller than the raw effect mean part")

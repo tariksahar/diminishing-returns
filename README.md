@@ -21,19 +21,21 @@ expects a collapse — the finale — is usually a show's *peak*.
 | "Shows decline over time" | Only **16.9%** clearly decline. **57.4%** are essentially flat, **25.7%** clearly rise. |
 | "A show's quality drains away" | A show's second half lands within **0.07** of a rating point of its first half, even for the strongest starters. |
 | "Finales ruin everything" | Season finales beat the rest of their season **72.6%** of the time. Series finales rise **71.6%** of the time. |
-| "The final season is cursed" | Almost a coin flip: **50.6%** down, **49.2%** up. Only **12.6%** lose half a point or more. |
+| "The final season is cursed" | Almost a coin flip: **50.5%** down, **49.2%** up. Only **12.6%** lose half a point or more. |
 | "It depends on the genre" | Genre barely matters. **Age and length** do: every extra season costs **0.026** of a rating point, every decade newer adds **0.048**. |
 | "The first season is always best" | The **last** season is the single best more often (**37%**) than the first (**27%**). |
+| "But *my* shows declined" | Fair. Clear decline climbs with audience size, from **15%** among obscure shows to **43%** among the 60 household names. The belief fits the shows it's drawn from. |
 
 Decline is real — it just lives somewhere other than where the belief puts it:
-in shows that ran too long, and in shows that are simply old.
+in shows that ran too long, in shows that are simply old, and in the handful of
+shows famous enough for everyone to have an opinion about.
 
 ## Read it
 
 - **[The essay](docs/essay.md)** — *Your Favourite Show Probably Didn't
   Decline*: the full argument in plain language, with all nine figures. Start
   here.
-- **[The technical report](docs/technical_report.pdf)** (PDF, 12 pages) — the
+- **[The technical report](docs/technical_report.pdf)** (PDF, 16 pages) — the
   same findings in formal form: abstract, data, methods, results with
   confidence intervals, robustness checks, limitations, references and the full
   regression table. Source in [LaTeX](docs/technical_report.tex) and
@@ -66,6 +68,12 @@ A few things this project deliberately did the harder way:
 - **Confounds were separated, not assumed apart.** Newer shows *are* shorter, so
   "newer shows rise" and "shorter shows rise" might have been one finding in two
   costumes. An OLS holding each fixed shows both survive independently.
+- **The headline was checked against its own measurement error.** Each show's
+  trend is an estimate, so shows near the ±0.5 cut can land on the wrong side by
+  luck. Only a tenth of the spread between shows turns out to be noise, and it
+  inflates the apparent decline share by roughly a point rather than hiding it.
+  Getting that right meant discarding two standard corrections that give the
+  wrong answer here for reasons worth reading about.
 - **Colour was computed, not eyeballed.** The figure palette was validated for
   colour-blind separation and contrast (Machado-2009 simulation, OKLab ΔE). That
   check caught a pair of hues that were genuinely too close and would otherwise

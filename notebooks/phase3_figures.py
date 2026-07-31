@@ -8,6 +8,7 @@ against docs/decisions.md.
 Run from the repo root:  .venv/Scripts/python.exe notebooks/phase3_figures.py
 """
 
+import math
 import sys
 
 import numpy as np
@@ -317,9 +318,24 @@ def fig03_finale_premium():
 def fig04_final_season_curse():
     """Section 4 -- the final-season curse, with its robustness check beside it."""
     d = FINALSEASON["delta"].to_numpy(float)
-    pct_down = 100 * (d < 0).mean()
+    # COUNT both directions; do NOT derive one as 100 - the other. Ten ended
+    # series end exactly level, and deriving folds them into the risers -- the
+    # bug that put a wrong 49.4% into the documents (see docs/decisions.md).
+    # That fix recorded that no figure plotted the number; it was wrong, because
+    # this panel title did, and went on showing 49.4% against a corrected 49.2%
+    # in the prose one line below it.
+    #
+    # And compare against a tolerance, matching phase2_finalseason.py: a tie is
+    # two equal rationals that float arithmetic renders as +/-1e-15, so `== 0`
+    # undercounts ties and this file's JSON source rounds a different subset of
+    # them to zero again.
+    LEVEL_TOL = 1e-9
+    pct_down = 100 * (d < -LEVEL_TOL).mean()
+    pct_up = 100 * (d > LEVEL_TOL).mean()
+    n_level = int((np.abs(d) <= LEVEL_TOL).sum())
     median = np.median(d)
     print(f"  n={len(d):,} ended shows, {pct_down:.1f}% weaker final season, "
+          f"{pct_up:.1f}% stronger, {n_level} exactly level, "
           f"median {median:+.3f}, mean {d.mean():+.3f}")
 
     thresholds = [-0.2, -0.3, -0.5, -0.75, -1.0]
@@ -356,8 +372,8 @@ def fig04_final_season_curse():
                            "Final season vs the rest (points)"))
     ax1.set_ylabel("Number of shows")
     fs.panel_title(ax1, wording(f"Almost a coin flip: {pct_down:.1f}% down, "
-                                f"{100 - pct_down:.1f}% up",
-                                f"{pct_down:.1f}% down, {100 - pct_down:.1f}% up"))
+                                f"{pct_up:.1f}% up",
+                                f"{pct_down:.1f}% down, {pct_up:.1f}% up"))
     fs.style_axes(ax1, grid="y")
 
     ax2.plot(range(len(thresholds)), sweep, color=RED, marker="o",
@@ -424,13 +440,33 @@ def fig05_era_length_genre():
         b, s, t = coef[n]
         print(f"  {n:<12} {b:+.4f} (se {s:.4f}, t {t:+.1f})")
 
-    def draw(ax, rows):
+    # The genre panel screens 16 coefficients at once, so |t| > 1.96 would flag
+    # roughly one genre by chance. Colour there uses a Bonferroni-corrected
+    # threshold instead; era/length/ongoing are pre-specified single hypotheses
+    # and keep the ordinary one. Computed, not transcribed: bisect the normal
+    # two-sided tail for alpha/16.
+    def critical_t(alpha):
+        lo, hi = 0.0, 10.0
+        for _ in range(100):
+            mid = (lo + hi) / 2
+            if math.erfc(mid / math.sqrt(2)) > alpha:
+                lo = mid
+            else:
+                hi = mid
+        return (lo + hi) / 2
+
+    T_SINGLE = critical_t(0.05)
+    T_GENRE = critical_t(0.05 / len(GENRES))
+    print(f"  significance thresholds: single |t|>{T_SINGLE:.2f}, "
+          f"genre panel (Bonferroni over {len(GENRES)}) |t|>{T_GENRE:.2f}")
+
+    def draw(ax, rows, t_crit):
         """rows: (label, coefficient name, unit scale). Dot + 95% CI per row."""
         ypos = np.arange(len(rows))[::-1]
         for y_, (label, key, scale) in zip(ypos, rows):
             b, s, t = coef[key]
             b, s = b * scale, s * scale
-            color = MUTED if abs(t) <= 2 else (BLUE if b > 0 else RED)
+            color = MUTED if abs(t) <= t_crit else (BLUE if b > 0 else RED)
             ax.plot([b - 1.96 * s, b + 1.96 * s], [y_, y_], color=color,
                     linewidth=2, solid_capstyle="round", alpha=0.55)
             ax.plot([b], [y_], marker="o", markersize=8, color=color,
@@ -448,7 +484,7 @@ def fig05_era_length_genre():
     # Row order matches the order the report's prose introduces them.
     draw(ax1, [("Each extra season", "n_season", 1),
                ("Ten years newer", "yr_c", 10),
-               ("Still airing", "ongoing_i", 1)])
+               ("Still airing", "ongoing_i", 1)], T_SINGLE)
     ax1.set_xlabel(wording("Effect on the show's trend (rating points across the run)",
                            "Effect on trend (points)"))
     fs.panel_title(ax1, wording("Length and age — each net of the other",
@@ -456,7 +492,7 @@ def fig05_era_length_genre():
     fs.style_axes(ax1, grid="x")
 
     order = sorted(GENRES, key=lambda g: coef[g][0])
-    draw(ax2, [(g, g, 1) for g in order])
+    draw(ax2, [(g, g, 1) for g in order], T_GENRE)
     ax2.set_xlabel(wording("Effect on the show's trend, net of age and length",
                            "Net of age and length"))
     fs.panel_title(ax2, wording("Genre matters far less", "Genre"))
@@ -467,8 +503,11 @@ def fig05_era_length_genre():
         "Decline is about a show's age and length, not its genre",
         "One regression, all factors at once: each effect is what remains after "
         "holding the others fixed.",
-        "Coloured dot = statistically significant (|t| > 2); grey = not "
-        "distinguishable from no effect. Bars are 95% confidence intervals.\n"
+        "Coloured dot = clears its panel's significance bar; grey = does not. "
+        "Bars are 95% confidence intervals.\n"
+        f"The right panel tests {len(GENRES)} genres at once, so a genre must "
+        f"clear a stricter bar: |t| > {T_GENRE:.2f} against |t| > {T_SINGLE:.2f} "
+        "on the left.\n"
         f"OLS on {len(d):,} shows; a show can carry several genres. {SOURCE}",
         rect=(0.115, 0.10, 0.985, 0.845),
     )

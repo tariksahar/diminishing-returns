@@ -10,11 +10,15 @@ This script tests whether it is measurable instead of merely plausible, by
 cutting the same sqrt(votes)-weighted slope by how widely watched a series is
 (total votes across all its episodes, the only popularity proxy in the data).
 
-Four parts, in the order the objections arrive:
+Five parts, in the order the objections arrive:
   1. the raw gradient across popularity tiers
   2. is it a precision artifact? (slope standard error by tier)
   3. is it just the known length effect? (within fixed season bands)
   4. does it survive era and length jointly? (OLS)
+  5. the same cut on the final-season delta, because that is the quantity the
+     report's final-season section makes a fame claim about -- the slope and the
+     delta answer different questions (see docs/decisions.md), so the claim
+     cannot borrow part 1's numbers and needs its own
 
 TWO CAVEATS THAT MUST TRAVEL WITH ANY USE OF THIS RESULT:
 
@@ -55,6 +59,23 @@ def tier_of(total_votes):
     return None
 
 
+def wilson(successes, n, z=1.96):
+    """95% Wilson score interval for a proportion, as percentages.
+
+    The top popularity tier is small by construction -- only a few dozen series
+    are household names -- so a bare percentage there invites more confidence
+    than it earns. Wilson rather than the normal approximation because it stays
+    inside [0, 1] and behaves at small n.
+    """
+    if n == 0:
+        return float("nan"), float("nan")
+    p = successes / n
+    denom = 1 + z ** 2 / n
+    centre = (p + z ** 2 / (2 * n)) / denom
+    half = z * np.sqrt(p * (1 - p) / n + z ** 2 / (4 * n ** 2)) / denom
+    return 100 * (centre - half), 100 * (centre + half)
+
+
 slopes["tier"] = slopes["total_votes"].apply(tier_of)
 
 # ----------------------------------------------------------------------
@@ -63,12 +84,14 @@ slopes["tier"] = slopes["total_votes"].apply(tier_of)
 print("=" * 78)
 print("(1) DECLINE BY POPULARITY TIER")
 print("=" * 78)
-print(f"{'tier':<30}{'n':>6}{'clear decline':>15}{'clear rise':>12}{'median slope':>14}")
+print(f"{'tier':<30}{'n':>6}{'clear decline':>15}{'95% CI':>16}{'median slope':>14}")
 for _, _, label in TIERS:
     s = slopes[slopes["tier"] == label]
-    dec = 100 * (s["slope"] <= -CLEAR).mean()
-    ris = 100 * (s["slope"] >= CLEAR).mean()
-    print(f"  {label:<28}{len(s):>6}{dec:>14.1f}%{ris:>11.1f}%{s['slope'].median():>+14.3f}")
+    n_dec = int((s["slope"] <= -CLEAR).sum())
+    dec = 100 * n_dec / len(s)
+    lo, hi = wilson(n_dec, len(s))
+    print(f"  {label:<28}{len(s):>6}{dec:>14.1f}%{f'{lo:.1f}-{hi:.1f}':>16}"
+          f"{s['slope'].median():>+14.3f}")
 print()
 print(f"Whole dataset for reference: {100*(slopes['slope'] <= -CLEAR).mean():.1f}% clear decline, "
       f"median {slopes['slope'].median():+.3f}")
@@ -184,6 +207,54 @@ print("Each tenfold increase in total votes costs the trend "
 print(f"larger in magnitude than one extra season ({abs(beta[2]):.3f}) and estimated just")
 print("as sharply. Popularity is not standing in for era or length.")
 print()
+
+# ----------------------------------------------------------------------
+# (5) THE SAME CUT ON THE FINAL-SEASON DELTA
+# ----------------------------------------------------------------------
+# §4.4 of the technical report states that the cursed minority is dominated by
+# well-known series. Parts 1-4 measured the SLOPE, and this project established
+# that the slope is not a proxy for the final-season question, so that claim
+# cannot lean on them -- it needs the delta cut the same way. Ended series only:
+# an unfinished show has no final season yet.
+print("=" * 78)
+print("(5) THE FINAL-SEASON CURSE BY POPULARITY TIER (ended series only)")
+print("=" * 78)
+ended = df[~df["ongoing"]]
+deltas = []
+for show_id, g in ended.groupby("show_tconst"):
+    final_season = g["season_number"].max()
+    final = g[g["season_number"] == final_season]["average_rating"]
+    rest = g[g["season_number"] != final_season]["average_rating"]
+    if len(rest) == 0:
+        continue
+    deltas.append({
+        "show_id": show_id,
+        "delta": float(final.mean() - rest.mean()),
+        "total_votes": int(g["num_votes"].sum()),
+    })
+dl = pd.DataFrame(deltas)
+dl["tier"] = dl["total_votes"].apply(tier_of)
+
+CURSED = -0.5  # the same cut the headline uses
+print(f"{'tier':<30}{'n':>6}{'clearly cursed':>16}{'95% CI':>16}{'median delta':>14}")
+for _, _, label in TIERS:
+    s = dl[dl["tier"] == label]
+    if len(s) == 0:
+        continue
+    n_cur = int((s["delta"] <= CURSED).sum())
+    lo, hi = wilson(n_cur, len(s))
+    print(f"  {label:<28}{len(s):>6}{100*n_cur/len(s):>15.1f}%{f'{lo:.1f}-{hi:.1f}':>16}"
+          f"{s['delta'].median():>+14.3f}")
+print()
+print(f"All {len(dl):,} ended series for reference: "
+      f"{100*(dl['delta'] <= CURSED).mean():.1f}% cursed, "
+      f"median {dl['delta'].median():+.3f}")
+print()
+print("So the fame pattern is not confined to the slope: the final-season collapse")
+print("the belief is built on is also concentrated in the widely-watched series.")
+print("Both cuts carry the endogeneity caveat below.")
+print()
+
 
 print("=" * 78)
 print("WHAT THIS DOES AND DOES NOT LICENSE")

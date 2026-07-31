@@ -23,15 +23,20 @@ negligible extra decline of 0.07 rating points for the strongest starters.
 Season finales exceed the remainder of their own season 72.6% of the time, and
 series finales exceed their final season 71.6% of the time, so the moment the
 belief expects collapse is typically a local maximum. Among ended series the
-final season is weaker than the rest of the run in 50.6% of cases with a median
+final season is weaker than the rest of the run in 50.5% of cases with a median
 change of -0.006, and only 12.6% lose half a point or more; this conclusion is
 insensitive to the threshold chosen. Decline is concentrated rather than
 general: show length (-0.026 per season, t = -6.8) and premiere year (+0.048
 per decade, t = +4.8) each survive mutual adjustment, whereas genre is largely
 uninformative once age and length are controlled. The model explains only 6.0%
-of between-show variance, so these are reliable but small effects. We argue the
-persistence of the belief is consistent with availability bias: the minority of
-genuine collapses is disproportionately composed of highly-viewed series.
+of between-show variance, so these are reliable but small effects. Finally, the
+belief describes the series it is drawn from better than the population: the
+clear-decline share rises monotonically with a series' vote count, reaching
+43.3% among the 60 most-watched series against a 16.9% base rate, and this
+gradient survives controls for precision, length and era. Because vote counts
+respond to disappointment as well as recording it, we report this as
+descriptive; it offers a measured account of how a belief this durable coexists
+with evidence this consistent.
 
 **Keywords:** television ratings, quality trajectories, regression to the mean,
 availability bias, IMDb
@@ -45,7 +50,7 @@ claim is specific enough to be testable — it asserts that a show's quality
 declines monotonically or near-monotonically with time on air — yet it is
 usually supported by enumeration of memorable cases rather than by measurement.
 
-This report tests the claim directly. We ask five questions:
+This report tests the claim directly. We ask six questions:
 
 1. What is the distribution of per-show quality trajectories?
 2. Is a show's later quality predictable from its earlier quality, and does
@@ -53,11 +58,13 @@ This report tests the claim directly. We ask five questions:
 3. Do finales — season and series — underperform, as the belief implies?
 4. Is there a "final-season curse"?
 5. If decline exists, which show characteristics predict it?
+6. Does the belief describe the series it is actually drawn from — the
+   widely-watched ones — better than it describes the population?
 
 Our contribution is not a new method but a disciplined application of standard
 ones to a question usually argued anecdotally, with explicit attention to the
 artefacts that make naive versions of this analysis produce the opposite
-answer. Section 5 documents four such artefacts, one of which produced an
+answer. Section 5 documents five such artefacts, one of which produced an
 apparently strong effect that survived neither reformulation nor replication.
 
 ---
@@ -151,7 +158,9 @@ The estimate $\hat{b}$ is the show's **trend**: the
 rating points gained or lost between first and last episode. A show is
 classified as *clearly declining* if $\hat{b} \le -0.5$, *clearly rising* if
 $\hat{b} \ge +0.5$, and *essentially flat* otherwise. The half-point cut is a
-perceptibility convention, not a statistical one; §5.3 reports its sensitivity.
+perceptibility convention, not a statistical one; §5.6 examines what estimation
+error costs it. (The threshold sweep in §5.3 is over the final-season cut of
+§3.2, a different quantity.)
 
 **Choice of weights.** Vote counts vary substantially within a series (median
 max/min ratio 3.5, exceeding 10 for a tenth of series), so an unweighted fit
@@ -275,15 +284,23 @@ finales fall 0.5 points or more below their final season — the memorable
 **Figure 6.** Distribution of $\Delta$ for ended series, with a sensitivity
 sweep over the "cursed" threshold.
 
-Across 2,710 ended series, 50.6% have a weaker final season and 49.2% a
-stronger one (six end exactly level), with median $\Delta = -0.006$ and mean
+Across 2,710 ended series, 50.5% have a weaker final season and 49.2% a
+stronger one (ten end exactly level), with median $\Delta = -0.006$ and mean
 $-0.049$. **12.6%** are
 clearly cursed at the -0.5 cut. The cursed minority is dominated by
 well-known series (*House of Cards* -4.24, *Game of Thrones* -2.55, *Master of
-None* -2.54, *The Promised Neverland* -2.28), which we read as the mechanism
+None* -2.54, *The Promised Neverland* -2.28), which suggests the mechanism
 sustaining the belief: the observable instances are disproportionately the
-famous ones. This interpretation is not established by our data; it is
-consistent with them.
+famous ones.
+
+That is measurable rather than merely illustrative. Cutting $\Delta$ by series
+popularity gives a monotone gradient — 11.6% clearly cursed among series under
+5,000 votes, 12.5%, 14.4%, and **23.8%** among the 42 household names above
+500,000, with median $\Delta$ moving from +0.063 to -0.209. The top tier is
+small and its interval correspondingly wide (95% Wilson score [8] 13.5–38.5%),
+so this is
+the weaker of the two fame gradients we measure; the slope-based one in §4.7 is
+sharper and better powered. Both carry the endogeneity caveat stated there.
 
 $\Delta$ and $\hat{b}$ correlate +0.80, so roughly a third of their variation
 is independent and they are not interchangeable. Notably, the pure "flat then
@@ -295,7 +312,11 @@ late crash necessarily tilts a fitted line downward.
 
 ![Coefficient plot](../figures/fig05_era_length_genre.png)
 
-**Figure 7.** OLS coefficients with 95% confidence intervals.
+**Figure 7.** OLS coefficients with 95% confidence intervals. The genre panel
+screens 16 coefficients simultaneously and so uses a Bonferroni-corrected bar
+($|t| > 2.96$); the era/length panel tests pre-specified single hypotheses and
+uses $|t| > 1.96$. Under Benjamini–Hochberg, Documentary, Romance and Thriller
+would also be coloured; Biography would not.
 
 Raw cross-sectional cuts are heavily confounded: median seasons per series
 falls from 5 in the 1950s to 2 in the 2020s while the ongoing share rises from
@@ -308,10 +329,18 @@ falls from 5 in the 1950s to 2 in the 2020s while the ongoing share rises from
   effect survives restriction to ended series and to fixed length bands, so it
   is not a length or ongoing-status artefact. 59.3% of pre-2000 series decline
   against 38.6% of later ones.
-- **Genre**: only Animation ($+0.233$, $t = 5.57$), Documentary ($-0.235$,
-  $t = -2.73$), Biography ($-0.244$, $t = -2.25$), Adventure ($-0.165$),
-  Thriller ($-0.153$) and Romance ($-0.143$) reach significance. Drama, Comedy,
-  Crime and Action — the bulk of the sample — are indistinguishable from zero.
+- **Genre**: six of the sixteen genre indicators reach significance
+  individually, but sixteen simultaneous tests are expected to produce about
+  0.8 spurious flags at $\alpha = 0.05$, so the family requires a correction.
+  Only **Animation** ($+0.233$, $t = 5.57$) and **Adventure** ($-0.165$,
+  $t = -3.75$) survive Bonferroni ($\alpha = 0.0031$, $|t| > 2.96$).
+  Benjamini–Hochberg [7], which controls the false discovery rate and is the more
+  appropriate screen for a set of exploratory indicators, additionally retains
+  Documentary ($-0.235$), Romance ($-0.143$) and Thriller ($-0.153$).
+  **Biography** ($-0.244$, $t = -2.25$) survives neither and is not reported
+  as an effect: it is the weakest of the raw six and rests on 53 series.
+  Drama, Comedy, Crime and Action — the bulk of the sample — are
+  indistinguishable from zero under any threshold.
 
 **The model explains 6.0% of between-show variance** ($R^2 = 0.0603$, residual
 SD 0.756). The effects are estimated precisely but are small relative to the
@@ -351,6 +380,61 @@ time, the middle third 24.9%, and the last third 33.3% — the middle is the
 balance. Finally, the last season is the single best season **37.2%** of the
 time against **27.1%** for the first, contradicting the "first season is
 always best" claim in aggregate.
+
+### 4.7 Popularity and the provenance of the belief
+
+§4.1 is a statement about the average series. The belief under test is not
+formed from the average series: it is formed from the few dozen titles a mass
+audience has actually watched. Whether those behave like the population is
+therefore a substantive question rather than a rhetorical one, and it is
+measurable using each series' total vote count — the only popularity proxy the
+data carries.
+
+| Tier | Series | Clear decline | 95% CI | Median $\hat{b}$ |
+|---|---:|---:|---:|---:|
+| Under 5,000 votes | 1,184 | 14.8% | 12.9–16.9 | +0.224 |
+| 5,000–50,000 | 1,545 | 15.1% | 13.4–17.0 | +0.078 |
+| 50,000–500,000 | 445 | 24.7% | 20.9–28.9 | −0.041 |
+| Over 500,000 | 60 | **43.3%** | 31.6–55.9 | **−0.392** |
+
+Intervals are 95% Wilson score intervals [8] for the clear-decline share; the
+top tier is small enough that a bare percentage would overstate its precision.
+
+The gradient is monotone, and the most-watched tier declines at roughly three
+times the 16.9% base rate — an interval that does not overlap the least-watched
+tier's. Three attempts to dissolve it all fail:
+
+- **Not a precision artefact.** A noisier fit crosses a fixed $\pm 0.5$ cut
+  more often by chance, so systematically noisier estimates among obscure
+  series could manufacture the whole gradient. Median slope standard errors are
+  essentially flat across the four tiers (0.207, 0.174, 0.191, 0.205): popular
+  series have less noise per episode but genuinely bumpier ratings, and the two
+  roughly cancel. The intuition that popular means better-measured is wrong
+  here, which is why it was checked rather than assumed.
+- **Not the length effect in disguise.** Popular series run longer
+  ($r = 0.37$ between log votes and season count) and long series were already
+  shown to decline. Holding the season band fixed, the gap survives in every
+  band: 13.1% against 31.0% at 2–3 seasons, 15.1% against 36.6% at 4–5, and
+  23.2% against 38.2% at 6+ (obscure < 20,000 votes against popular
+  $\ge$ 200,000).
+- **Survives era and length jointly.** Regressing $\hat{b}$ on
+  $\log_{10}$(votes), season count and premiere year gives $-0.134$ per tenfold
+  increase in votes ($t = -6.2$), larger in magnitude than a whole extra season
+  ($-0.019$) and estimated as sharply.
+
+**Vote count is endogenous, and no causal claim is available.** This project
+documented the mechanism itself while choosing a weighting scheme (§3.1): a
+final-season backlash inflates vote counts, which is why four of *Game of
+Thrones*' six most-voted episodes belong to season 8. Decline raises votes as
+surely as votes track decline, so the arrow cannot be pointed, and fame cannot
+be said to cause anything here.
+
+What survives is descriptive. The series the
+belief is drawn from do not behave like the typical series, and "fewer than one
+in six" is not a statement about them. This is offered as a reconciliation
+rather than a retraction: §4.1 remains the correct answer to "do series
+decline", and this section explains why an honest viewer with a different
+sample would answer differently.
 
 ---
 
@@ -404,6 +488,60 @@ three findings: newer series are shorter. The §3.5 specification holds each
 fixed, and both era and length survive. We additionally verified the era effect
 within ended series and within a fixed 2–3-season band, where it does not fade.
 
+### 5.6 Estimation error in the trend
+
+Each $\hat{b}$ is an estimate, and §4.1 sorts estimates into bands cut at
+$\pm 0.5$. A series near a cut-off can therefore land on the wrong side of it by
+chance. Two questions follow, and they have opposite-looking answers.
+
+**Individual labels are soft.** The median slope standard error is 0.189 (IQR
+0.139–0.255), which is not small against a band half-width of 0.5. Of the 545
+series labelled clearly declining, 285 (52%) have a 95% interval that still
+touches $-0.5$; of the 832 labelled clearly rising, 510 (61%) do. Only 55% of
+series have a slope distinguishable from zero at all. The bands are a reporting
+convention over a continuous quantity, not a per-series verdict, and we do not
+make claims about individual series on their basis.
+
+**The population split is barely distorted.** Estimation errors are independent
+of the true slopes, so the observed variance decomposes: 0.6049 observed = 0.5434
+real between-series variance + 0.0614 mean squared estimation error. Only 10% of
+the spread between series is noise. This step requires no assumption about the
+shape of either distribution and is the firmer of the two results here.
+
+**Recovering a noise-free split does require a shape assumption, and the obvious
+tools fail.** Two were tried and rejected, and we report them because they
+explain why the estimate below is stated cautiously:
+
+- *Empirical-Bayes shrinkage* [9] is the wrong instrument for this question.
+  Posterior means are deliberately over-shrunk as a set — here their variance is
+  0.4238 against a true 0.5434, 22% too narrow — so counting how many fall past
+  a fixed cut understates both tails by construction. It reports 15.2% decline,
+  which is too low for a mechanical reason rather than an empirical one.
+- *A normal model for the true slopes* is rejected by the data. Read
+  parametrically, true $\sim N(0.073, 0.543)$ implies 21.9% decline, higher than
+  the observed 16.9% and thus the opposite sign. It also predicts an *observed*
+  share of 23.1% against the 16.9% actually seen, so it cannot reproduce the
+  data it is fitted to. The slopes are skewed ($-0.64$) and fat-tailed (excess
+  kurtosis $+5.60$; 0.53% lie beyond four SD against 0.006% under a normal).
+
+What we use instead is a scale-family deconvolution that assumes only normal
+estimation *error* — already assumed by every standard error in this report — and
+no shape for the true slopes beyond preservation under scaling. Solving for the
+scale $c$ at which the expected share of noisy estimates past the cut,
+$\overline{\Phi((\text{cut}-t_i)/\hat\sigma_i)}$, matches the observed share
+gives $c = 0.927$ and a corrected split of **15.6% / 60.4% / 23.9%**. It is
+fitted on the decline share alone and predicts a rise share of 25.0% against the
+25.7% observed, which is a genuine out-of-sample check.
+
+**The direction is robust; the magnitude is not, and only the direction is
+claimed.** Noise smooths a density that is peaked inside the middle band, so mass
+necessarily flows outward across that band's two edges — the middle is the only
+class with two edges to lose across. This is visible without any deconvolution:
+treating the estimates themselves as the truth and adding their own noise
+predicts 18.1% observed decline against the 16.9% seen. So estimation error
+inflates the apparent decline share by roughly a point, and we report the
+uncorrected figures throughout, which is the conservative choice.
+
 ---
 
 ## 6. Limitations
@@ -449,10 +587,14 @@ finale — the data show a local maximum in roughly seven cases out of ten.
 
 Decline is nonetheless real in identifiable subsets: long-running series, older
 series, and a 12.6% minority of ended series whose final season drops
-materially. That minority is composed disproportionately of widely-watched
-titles, which offers a parsimonious account of how a belief this durable
-survives evidence this consistent — the counterexamples are, by construction,
-the ones nobody talks about.
+materially. It is also real in the subset the belief is actually drawn from.
+Among the sixty most-watched series in the corpus, 43.3% clearly decline against
+a 16.9% base rate, and the gradient across popularity tiers is monotone and
+robust to controls for precision, length and era (§4.7). This is the
+reconciliation the paper ends on, and it is not a retraction: the belief is a
+poor description of television and a fair description of the television its
+holders have seen. The counterexamples are, by construction, the series nobody
+talks about.
 
 The effects we can identify are precisely estimated but jointly explain 6% of
 the variation between series. Whatever determines a show's trajectory is mostly
@@ -483,6 +625,18 @@ physiologically-based model for simulation of color vision deficiency.
 *IEEE Transactions on Visualization and Computer Graphics*, 15(6), 1291–1298.
 (Used to validate the figure palette for colour-vision deficiency.)
 
+[7] Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate:
+a practical and powerful approach to multiple testing. *Journal of the Royal
+Statistical Society: Series B*, 57(1), 289–300.
+
+[8] Wilson, E. B. (1927). Probable inference, the law of succession, and
+statistical inference. *Journal of the American Statistical Association*,
+22(158), 209–212.
+
+[9] Efron, B., & Morris, C. (1975). Data analysis using Stein's estimator and
+its generalizations. *Journal of the American Statistical Association*, 70(350),
+311–319.
+
 ---
 
 ## Appendix A. Full cross-sectional model
@@ -490,6 +644,15 @@ physiologically-based model for simulation of color vision deficiency.
 OLS of the per-show trend on era, length, ongoing status and 16 non-exclusive
 genre indicators. $n = 3{,}234$, $R^2 = 0.0603$, residual SD 0.756. Premiere
 year is centred; the genre reference category is "not carrying that genre".
+
+The sixteen genre coefficients are a family of simultaneous tests and the *t*
+column must be read as such. Bonferroni ($\alpha = 0.05/16 = 0.0031$, i.e.
+$|t| > 2.96$) leaves **Animation** and **Adventure**; Benjamini–Hochberg at the
+same level (reject $p \le 0.0129$) additionally leaves Documentary, Romance and
+Thriller. Biography clears the raw 5% bar but neither correction, and should not
+be read as an effect. Era, length and ongoing status are pre-specified single
+hypotheses, are not members of the genre family, and keep the ordinary
+$|t| > 1.96$ threshold.
 
 | Variable | Coefficient | Std. error | *t* | Series |
 |---|---:|---:|---:|---:|

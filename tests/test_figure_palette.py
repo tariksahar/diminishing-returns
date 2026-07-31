@@ -64,6 +64,32 @@ def test_orange_and_red_never_share_a_figure(figure_functions):
     )
 
 
+def test_no_figure_derives_a_complementary_share(figure_functions):
+    """Shares must be COUNTED, never derived as `100 - other`.
+
+    Six ended series have a final season exactly level with the rest of their
+    run, so `100 - pct_down` silently counts them as risers. That mistake was
+    fixed once in phase2_finalseason.py, and the decision log recorded that no
+    figure was affected -- but fig04's panel title had written `100 - pct_down`
+    independently, and went on displaying 49.4% above prose saying 49.2%.
+
+    Grepping for the wrong value could never have caught it: the figure computed
+    the number rather than containing it. So the check is on the shape of the
+    expression, which is the thing that recurs."""
+    offenders = []
+    for name, node in figure_functions.items():
+        for child in ast.walk(node):
+            if (isinstance(child, ast.BinOp)
+                    and isinstance(child.op, ast.Sub)
+                    and isinstance(child.left, ast.Constant)
+                    and child.left.value == 100):
+                offenders.append(f"{name}: 100 - {ast.unparse(child.right)}")
+    assert not offenders, (
+        "Derived complementary shares drop exact ties into the wrong bucket. "
+        "Count the other side instead:\n  " + "\n  ".join(offenders)
+    )
+
+
 def test_the_palette_constants_are_the_validated_ones(figure_functions):
     """The hex values that passed the colour-blind and contrast checks. Changing
     one means re-running that validation, not editing this list."""

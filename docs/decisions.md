@@ -42,8 +42,8 @@ Rationale, in short:
 2. **Ongoing shows (`endYear` empty) → flag, don't drop. RESOLVED.**
    `ongoing` boolean added in build. Ongoing shows are excluded from the
    final-season-curse analysis (`data/processed/_phase2_finalseason_full.json`,
-   2,710 ended shows only). Finding: no systematic curse — 50.6% of ended
-   shows have a lower-than-usual final season, 49.2% higher (six exactly
+   2,710 ended shows only). Finding: no systematic curse — 50.5% of ended
+   shows have a lower-than-usual final season, 49.2% higher (ten exactly
    level), median delta ≈ 0.00. Only 12.6% show a clear curse (final season ≥0.5 points below the
    rest), and those are disproportionately well-known flops (House of Cards
    -4.24, Game of Thrones -2.55, Master of None -2.54) — likely why the
@@ -363,15 +363,167 @@ itself while choosing a weighting scheme — a final-season backlash inflates
 vote counts, which is why four of Game of Thrones' six most-voted episodes are
 season-8 ones. Decline raises votes as surely as votes track decline, so the
 arrow cannot be pointed and **no causal claim is available here**. What
-survives is descriptive, and is still worth having: the series the belief is
+survives is descriptive: the series the belief is
 drawn from do not behave like the typical series, and "fewer than one in six"
 is not a statement about them.
 
-**Not yet reflected in the essay or the technical report.** Deliberately: §4's
-availability-bias paragraph is currently hedged as interpretation, and this
-result would let it be stated as measurement instead. That is a prose decision
-about the strongest section of the essay, and it is not being made in the same
-pass that produced the number. The finding is logged here first.
+**Now reflected everywhere — RESOLVED.** It was deliberately logged here first:
+§4's availability-bias paragraph was hedged as interpretation, this result lets
+it be stated as measurement, and that is a prose decision about the strongest
+section of the essay which should not be made in the same pass that produced the
+number. A later pass made it, and it went further than the essay:
+
+- **Essay §4** states the gradient (15% obscure → 43% household names, and 12% →
+  24% on the final-season delta), then keeps the endogeneity caveat in plain
+  language. The section was already titled "The curse that only strikes the
+  famous"; it now earns the title.
+- **Essay §9** was corrected for consistency, and this is the part worth
+  recording. The closing told the reader "the odds are against it" about a show
+  they had almost certainly picked *because* it was famous — for which the rate
+  is 43%, not 17%. A finding that reframes §4 silently invalidated a sentence
+  five sections later. Fixed to name both figures.
+- **Technical report** gains §4.7 with the tier table, all three robustness
+  checks and the endogeneity caveat; §4.4's "this interpretation is not
+  established by our data" is replaced by the delta cut; the abstract, the
+  conclusion and the introduction's list of questions (now six) all carry it.
+- **README** gains a findings-table row.
+
+**A second cut was added for §4.4's sake.** Parts 1-4 of `phase2_popularity.py`
+measure the SLOPE, and this log already establishes that the slope is not a proxy
+for the final-season question. §4.4's fame claim is about the final-season delta,
+so it could not borrow those numbers and needed its own cut (part 5): 11.6% /
+12.5% / 14.4% / **23.8%** clearly cursed across the four tiers, median delta
++0.063 → -0.209, against a 12.6% base rate. Monotone, same direction.
+
+**Wilson intervals on both tables, because the top tier is small by
+construction** — 60 series by slope, 42 by delta. They changed the wording: the
+slope gradient is sharp (43.3%, CI 31.6-55.9, not overlapping the least-watched
+tier's 12.9-16.9) while the delta gradient is suggestive but weakly powered
+(23.8%, CI 13.5-38.5, lower bound barely clearing the 12.6% base rate). §4.4 now
+says it is the weaker of the two instead of presenting them as equal evidence.
+
+### Sixteen genre tests at once: Biography did not survive the correction
+
+The genre model screens 16 non-exclusive genre dummies in one regression and the
+first version reported significance per coefficient at `|t| > 2`. At α = 0.05,
+16 simultaneous tests are expected to produce about 0.8 false flags — so "six
+genres reach significance" could not be reported as six findings, and the
+weakest names on the list are exactly where the expected false positive lands.
+
+`phase2_rtm_genre.py` now computes two-sided p-values (normal tail via `erfc`;
+with 3,214 residual df the t-distribution is indistinguishable from the normal,
+so this avoids a scipy dependency) and applies both corrections over the genre
+family only. Era, length and ongoing status are pre-specified single hypotheses
+and are deliberately NOT members of the family.
+
+| Screen | Threshold | Genres surviving |
+|---|---|---|
+| Raw | α = 0.05, \|t\| > 1.96 | 6 |
+| Benjamini-Hochberg | reject p <= 0.0129 | 5 (adds Documentary, Romance, Thriller) |
+| Bonferroni | α = 0.0031, \|t\| > 2.96 | **2 — Animation, Adventure** |
+
+**What this changed in the prose.** Biography
+(-0.244, t = -2.25, and only 53 series) was named in the essay, the technical
+report and the outline as a genre that genuinely declines. It clears the raw 5%
+bar and neither correction. It is now dropped from all three, and the essay's
+genre sentence says so explicitly rather than quietly omitting it — a reader who
+saw an earlier draft deserves to know the claim was withdrawn, not lost.
+
+Two smaller consequences worth recording:
+- **Adventure was undersold.** The first draft listed it among the also-rans
+  ("Adventure -0.165") when at t = -3.75 it is one of only two genres that
+  survive Bonferroni, i.e. the second-strongest genre effect in the model after
+  Animation. Raw-threshold reporting had flattened a real ranking.
+- **fig05 had to change, not just the text.** The coefficient plot coloured any
+  |t| > 2 estimate, which would have shown four genres as significant that do
+  not survive correction. This is the same class of problem as the orange/red
+  palette defect: a figure making a claim the analysis no longer supports. Fixed
+  the same way — fixed, not disclosed. The genre panel now colours at the
+  Bonferroni threshold while the era/length panel keeps |t| > 1.96, both
+  thresholds computed in the figure code rather than hard-coded, and the
+  footnote states that the two panels use different bars and why. All three
+  render modes were regenerated.
+
+References added for the methods now used: Benjamini-Hochberg (1995), Wilson
+(1927) for the score intervals in the popularity tables, and Efron-Morris (1975)
+for the shrinkage in §5.6.
+
+### Estimation error in the headline split
+
+The headline sorts every series into bands cut at ±0.5, but each slope is an
+estimate, and nothing had checked what that costs. `phase2_slope_precision.py`
+does. Two results, both reported because either alone misleads:
+
+1. **A per-series label is soft.** Median slope SE 0.189 against a band
+   half-width of 0.5. Of 545 "clear decline" series, 285 (52%) have a 95% CI
+   still touching -0.5; only 55% of series have a slope distinguishable from
+   zero. The bands are a reporting convention over a continuous quantity, so no
+   claim is made about an individual series from its band.
+2. **The population split is barely distorted.** Variances add, so observed
+   0.6049 = real 0.5434 + error 0.0614: a tenth of the spread is noise. Noise
+   inflates the apparent decline share by about a point. Detail in technical
+   report §5.6.
+
+The script asserts its refitted slopes match `_phase2_slopes_full.json` to 1e-9
+before computing anything, so it cannot measure the precision of a different fit
+than the one published.
+
+### The first version of that correction was wrong, and it is the same mistake a third time
+
+Worth recording at length because the pattern is now established. The first draft
+of §5.6 corrected the split with **empirical-Bayes shrinkage** and reported
+15.2 / 61.3 / 23.5. An external review pass challenged it and the challenge held
+up on re-derivation.
+
+The error: posterior means are over-shrunk *as a set* by design. Their variance
+here is 0.4238 against a true between-series variance of 0.5434 — 22% too narrow.
+Counting how many fall past a fixed cut therefore understates both tails
+mechanically, whatever the data. Shrinkage is the right tool for estimating each
+series' slope and the wrong tool for estimating the *distribution* of slopes.
+
+**This is the third instance in this project of an estimator quietly answering a
+different question than the one asked:**
+- the slope-vs-own-intercept correlation, which measured shared noise rather than
+  regression to the mean (-0.373, discarded);
+- the overall slope used as a final-season proxy, which a straight line cannot
+  represent (replaced by the direct season contrast);
+- and now posterior means used as a distribution.
+
+The lesson generalises better than any of the three fixes: when a number is
+computed for one purpose and reused for another, re-derive what it estimates.
+
+A second trap was found while fixing the first, and is recorded because it points
+the *opposite* way. Reading the same normal model parametrically — true slopes
+~ N(0.073, 0.543) — gives **21.9%** decline, i.e. *higher* than the published
+16.9%. Two estimators, one assumption, opposite signs. That model is rejected
+outright: it predicts an observed share of 23.1% against the 16.9% we see, so it
+cannot reproduce the data it is fitted to. The slopes are skewed (-0.64) and
+fat-tailed (excess kurtosis +5.60; 0.53% beyond 4 SD against 0.006% expected).
+Normality was not a harmless technicality here — it determined the sign.
+
+**What replaced it.** A scale-family deconvolution: solve for the scale `c` at
+which the expected share of noisy estimates past the cut,
+`mean(Phi((cut - t_i)/se_i))`, equals the observed share. `c = 0.927`, corrected
+split 15.6 / 60.4 / 23.9. It assumes normal estimation *error* (already assumed
+by every SE in the report) but nothing about the shape of the true slopes beyond
+scaling. Deliberately deterministic — no simulation, no seed — because a
+published number in this project must be reproducible exactly. It is fitted on
+the decline share alone and predicts the rise share at 25.0% against 25.7%
+observed, which is a real out-of-sample check.
+
+**And the claim was narrowed.** Only the DIRECTION is now asserted, because only
+the direction is assumption-free: noise smooths a density peaked inside the
+middle band, and the middle is the only class with two edges to lose mass across.
+Demonstrable without any deconvolution — feeding the estimates back as if they
+were the truth predicts 18.1% observed decline against the 16.9% seen. The
+magnitude (~1 point) carries a shape assumption and is stated as such.
+
+Two pieces of overclaiming were removed at the same time. The report had said the
+error "was working against it, not for it", and the essay had said *"Every number
+in this piece is the version that flatters our conclusion least"* — a sentence
+that invites exactly the audit that then failed it. The essay paragraph was also
+the fourth copy of the same content (script docstring, decisions log, report
+§5.6, essay) and is now two sentences, which is what it was worth.
 
 ## Phase 3 decisions (figures)
 
@@ -628,8 +780,10 @@ Two claims did not survive contact and were changed:
 Figure text now uses real em dashes rather than `--`, so figures and prose look
 like one document. Jargon that had leaked into figure labels was replaced with
 the words the essay itself uses: `r = +0.79` → "correlation +0.79",
-`By sqrt(votes)` → "By the square root of votes". `|t| > 2` stays in fig05's
-footnote because a plain-language gloss sits right beside it.
+`By sqrt(votes)` → "By the square root of votes". A `|t|` threshold stays in
+fig05's footnote because a plain-language gloss sits right beside it. (That
+footnote now names two thresholds, one per panel — see the multiplicity decision
+above.)
 
 ## Phase 3c decisions (the technical report's own figure set)
 
@@ -734,6 +888,13 @@ Three files under `tests/`, runnable with `pytest` from the repository root:
   and 71.6% finale premiums, the final-season split, and the -0.026 / +0.0048
   length and era coefficients. Plus the one that guards everything downstream:
   the stored `_phase2_slopes_full.json` must still match a fresh recompute.
+- Two tests were added later, with the closing pass, for the two claims that
+  arrived after this suite was written: the popularity gradient (all four tier
+  shares, the 60-series top tier, and that the gradient is *monotone* rather
+  than merely high at the top) and the multiplicity result (that exactly
+  `{Animation, Adventure}` survive Bonferroni, asserted as a set so a widening
+  fails, plus a named check that Biography does not — because a document
+  explicitly retracts it).
 - `test_figure_palette.py` — parses `phase3_figures.py` as a syntax tree and
   fails if any figure function references both ORANGE and RED. Static, so it
   cannot see a colour reached indirectly; every figure names its colours
@@ -751,14 +912,47 @@ counting them, which folds the **six ended series whose final season lands
 exactly level** with the rest of their run into the "stronger" column. So the
 published pair did sum to 100 — by absorbing the ties.
 
-Corrected to 50.6% / 49.2% / six level, in the script, the README, the essay,
-the outline, the technical report and this log. Nothing downstream moves: the
-finding was "almost exactly even" and it still is, the 12.6% clear-curse share
-is untouched, and no figure plotted the number.
+Corrected at the time to 50.6% / 49.2% / six level. The 12.6% clear-curse share
+was and is untouched.
+
+**That correction was itself incomplete, twice over, and both parts were found
+by reading the compiled PDF rather than the source.**
+
+*First: this entry claimed "no figure plotted the number", and that was false.*
+fig04's left-panel title read *"Almost a coin flip: 50.6% down, 49.4% up"*
+directly above prose saying 49.2%. The figure had written `100 - pct_down`
+independently, so fixing the script never touched it. Grepping for the value
+could not have caught it either — the figure computed the number rather than
+containing it.
+
+*Second, and larger: "six exactly level" was wrong too, and so was the 8 that
+the figure's data file reported.* A tie means two means of one-decimal ratings
+are equal as rationals, which float arithmetic often cannot represent: four such
+series land on ±1e-15 rather than 0.0. So `delta == 0` counted **6**; pandas
+`to_json` then rounded a different subset to zero at its default 10 decimals, so
+anything reading `_phase2_finalseason_full.json` saw **8**; and the true count at
+the data's own precision is **10**. Three answers to one question, all artifacts
+of how zero was compared. Both scripts now use an explicit `1e-9` tolerance, and
+the published pair moves to **50.5% / 49.2% / ten level**.
+
+Three lessons, in increasing order of how much they generalise:
+- The claim "nothing downstream is affected" is a claim, and it was asserted
+  rather than checked.
+- **Fixing a bug in one place does not fix the same reasoning elsewhere.**
+  `100 - x` for a complementary share was written independently twice. A static
+  test now fails if `100 -` appears in any figure function
+  (`test_figure_palette.py`) — the only form of guard that survives the next
+  person, since it matches the shape of the expression rather than a value.
+- **Never compare a float to zero to mean "equal".** This one had been sitting
+  in the data since Phase 2 and survived a dedicated correction pass aimed at the
+  very same number, because the pass fixed the counting and never questioned the
+  comparison. The test now asserts the tolerance count (10) *and* the naive
+  float-equality count (6) side by side, so the difference between them stays
+  visible instead of being rediscovered a third time.
 
 It is worth being clear about how small this is, and about why it was still
-worth chasing. Six series in 2,710, 0.2 of a percentage point, and no
-conclusion depends on it. But §7 of the essay makes an argument about exactly
+worth chasing. A handful of series in 2,710, a couple of tenths of a percentage
+point, and no conclusion depends on it. But §7 of the essay makes an argument about exactly
 this class of mistake — "headline findings get scrutinised; it's the confident
 little sentences *around* them where mistakes survive" — and the error was a
 derived-instead-of-counted share sitting one line away from a headline. The

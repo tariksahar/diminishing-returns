@@ -12,6 +12,8 @@ prose has to be updated deliberately rather than silently going stale.
 Run from the repository root:  pytest
 """
 
+import math
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -112,7 +114,7 @@ def test_series_finales_usually_rise(episodes):
 
 
 def test_the_final_season_is_close_to_a_coin_flip(episodes):
-    """README: 50.6% down, 49.2% up, and only 12.6% lose half a point or more.
+    """README: 50.5% down, 49.2% up, and only 12.6% lose half a point or more.
     Ended shows only -- an unfinished show has no final season yet."""
     ended = episodes[~episodes["ongoing"]]
     deltas = []
@@ -124,12 +126,130 @@ def test_the_final_season_is_close_to_a_coin_flip(episodes):
             continue
         deltas.append(final.mean() - rest.mean())
     deltas = np.array(deltas)
-    assert round(100 * (deltas < 0).mean(), 1) == 50.6
-    assert round(100 * (deltas > 0).mean(), 1) == 49.2
+
+    # Ties are compared against a tolerance, not against exact zero. A tie means
+    # two means of one-decimal ratings are equal as rationals, and float
+    # arithmetic renders four of them as +/-1e-15. Testing `== 0` reports 6 ties;
+    # the true count is 10, and pandas' to_json rounding reported 8 to whatever
+    # read the exported file. Three answers, all artifacts of comparing to zero.
+    TOL = 1e-9
+    assert (np.abs(deltas) <= TOL).sum() == 10
+    assert (deltas == 0).sum() == 6          # the float-equality count, for contrast
+
+    assert round(100 * (deltas < -TOL).mean(), 1) == 50.5
+    assert round(100 * (deltas > TOL).mean(), 1) == 49.2
     assert round(100 * (deltas <= -0.5).mean(), 1) == 12.6
-    # The two shares do not sum to 100: six series end exactly level. Counting
-    # them as risers is what put 49.4% into the documents.
-    assert (deltas == 0).sum() == 6
+    # The three shares must account for every series exactly once.
+    assert ((deltas < -TOL).sum() + (deltas > TOL).sum()
+            + (np.abs(deltas) <= TOL).sum()) == len(deltas)
+
+
+def test_the_belief_fits_the_famous_shows(episodes, slopes):
+    """README: clear decline climbs from 15% among obscure shows to 43% among
+    the 60 household names. This is the row that reconciles the headline with
+    the reader's own experience, so it is worth pinning."""
+    votes = episodes.groupby("show_tconst")["num_votes"].sum().rename("total_votes")
+    d = slopes.merge(votes, left_on="show_id", right_index=True)
+    share = lambda sub: round(100 * (sub["slope"] <= -CLEAR).mean(), 1)
+
+    assert share(d[d["total_votes"] < 5_000]) == 14.8
+    assert share(d[(d["total_votes"] >= 5_000) & (d["total_votes"] < 50_000)]) == 15.1
+    assert share(d[(d["total_votes"] >= 50_000) & (d["total_votes"] < 500_000)]) == 24.7
+
+    top = d[d["total_votes"] >= 500_000]
+    assert len(top) == 60
+    assert share(top) == 43.3
+    # The gradient is the claim, so it must be monotone, not merely high at the top.
+    tiers = [d[d["total_votes"] < 5_000],
+             d[(d["total_votes"] >= 5_000) & (d["total_votes"] < 50_000)],
+             d[(d["total_votes"] >= 50_000) & (d["total_votes"] < 500_000)],
+             top]
+    shares = [share(t) for t in tiers]
+    assert shares == sorted(shares)
+
+
+def test_only_two_genres_survive_the_multiplicity_correction(slopes, episodes):
+    """The genre model screens 16 coefficients at once, so the documents report
+    Animation and Adventure as the only Bonferroni survivors, and explicitly
+    withdraw Biography. If a future change re-widens that set, the prose in the
+    essay, the report and Appendix A all become wrong at once."""
+    per_show = episodes.groupby("show_tconst").agg(
+        n_season=("season_number", "nunique"),
+        start_year=("start_year", "first"),
+        ongoing=("ongoing", "first"),
+        genres=("genres", "first"),
+    ).reset_index()
+    d = slopes.merge(per_show, left_on="show_id", right_on="show_tconst")
+    d = d.dropna(subset=["start_year", "genres"])
+
+    genres = ["Documentary", "Biography", "Horror", "Family", "Mystery", "Romance",
+              "Fantasy", "History", "Sci-Fi", "Crime", "Drama", "Comedy",
+              "Thriller", "Adventure", "Action", "Animation"]
+    columns = [
+        d["start_year"].astype(float) - d["start_year"].astype(float).mean(),
+        d["n_season"].astype(float),
+        d["ongoing"].astype(float),
+    ] + [d["genres"].str.split(",").apply(lambda gs, g=g: float(g in gs)) for g in genres]
+
+    X = np.column_stack([np.ones(len(d))] + [c.to_numpy() for c in columns])
+    y = d["slope"].to_numpy(dtype=float)
+    XtX_inv = np.linalg.inv(X.T @ X)
+    beta = XtX_inv @ X.T @ y
+    resid = y - X @ beta
+    sigma2 = resid @ resid / (len(d) - X.shape[1])
+    se = np.sqrt(np.diag(sigma2 * XtX_inv))
+
+    # Genre coefficients start after intercept + year + seasons + ongoing.
+    alpha_corrected = 0.05 / len(genres)
+    survivors = set()
+    for i, g in enumerate(genres, start=4):
+        p = math.erfc(abs(beta[i] / se[i]) / math.sqrt(2))
+        if p < alpha_corrected:
+            survivors.add(g)
+
+    assert survivors == {"Animation", "Adventure"}
+    # Named separately because a document explicitly retracts it.
+    assert "Biography" not in survivors
+
+
+def test_noise_inflates_the_apparent_decline_share(episodes):
+    """Technical report §5.6. The claim is directional: estimation noise pushes
+    mass out of the flat middle band, so the observed 16.9% overstates the true
+    clear-decline share. Tested the assumption-free way -- feed the estimates
+    back as if they were the truth, add their own noise, and the expected
+    observed share must come out ABOVE what we actually observe.
+
+    Guards against the mistake the first version of §5.6 made: reporting a
+    shrinkage-based split, which understates both tails mechanically."""
+    rows = []
+    for _, g in episodes.groupby("show_tconst"):
+        g = g.sort_values("overall_order")
+        n = len(g)
+        y = g["average_rating"].to_numpy(dtype=float)
+        w = np.sqrt(g["num_votes"].to_numpy(dtype=float))
+        x = (g["overall_order"].to_numpy(dtype=float) - 1) / (n - 1)
+        total = w.sum()
+        x_bar = (w * x).sum() / total
+        y_bar = (w * y).sum() / total
+        s_xx = (w * (x - x_bar) ** 2).sum()
+        b = (w * (x - x_bar) * (y - y_bar)).sum() / s_xx
+        a = y_bar - b * x_bar
+        r = y - (a + b * x)
+        rows.append((b, math.sqrt(((w * r ** 2).sum() / (n - 2)) / s_xx)))
+    slope = np.array([r[0] for r in rows])
+    se = np.array([r[1] for r in rows])
+
+    observed = (slope <= -CLEAR).mean()
+    # Expected share of noisy estimates below the cut if the truth were `slope`.
+    phi = np.array([0.5 * (1 + math.erf(q / math.sqrt(2)))
+                    for q in (-CLEAR - slope) / se])
+    assert phi.mean() > observed          # the direction the report claims
+    assert round(100 * phi.mean(), 1) == 18.1
+    assert round(100 * observed, 1) == 16.9
+
+    # And the variance decomposition the section leads with: ~10% noise.
+    var_err = (se ** 2).mean()
+    assert round(100 * var_err / slope.var(ddof=1)) == 10
 
 
 def test_length_and_era_effects_keep_their_published_size(slopes, episodes):

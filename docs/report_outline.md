@@ -65,22 +65,38 @@ declines."*
   Office, Brooklyn 99, TNG).
 
 ## 4. The "final season curse" — mostly a myth  [🟢 + 🟡 caveat]
-- Ended shows split 50.6% down / 49.2% up, median ≈ 0; only 12.6% a clear
+- Ended shows split 50.5% down / 49.2% up (10 exactly level), median ≈ 0;
+  only 12.6% a clear
   curse. Robust to threshold sweep and effect-size. (finding #4)
 - The cursed minority is dominated by very famous shows (GoT -2.55, Master
   of None -2.54, The Promised Neverland -2.28). House of Cards is the single
   largest drop (-4.24) but is held back for §8 — see the note in §1.
-- 🟡 Interpretation (hedge explicitly — "a likely explanation, not something
-  the data proves"): availability bias — a few loud collapses make the curse
-  feel universal.
+- 🟢 **Availability bias, upgraded from interpretation to measurement**
+  (`phase2_popularity.py`, added after the first draft). Clear decline rises
+  monotonically with audience size: 14.8% / 15.1% / 24.7% / **43.3%** across
+  vote tiers, against a 16.9% base rate. Survives precision, length-band and
+  era+length checks. The final-season delta cut the same way is monotone too
+  (11.6% / 12.5% / 14.4% / 23.8%) but 🟡 — only 42 series in the top tier,
+  95% CI 13.5-38.5, so it is the weaker of the two and must be described as
+  such. (finding #10)
+- 🟡 Caveat that travels with both: vote count is endogenous (a bad ending
+  draws voters), so this is descriptive only — no causal claim that fame
+  causes decline.
+- Consistency note: this reframing invalidated §9's "the odds are against
+  it", written when 16.9% was the only rate available. §9 now names both.
 
 ## 5. Where decline IS real — age, length, genre  [🟢]
 - Older and longer shows genuinely decline; newer and shorter ones rise.
   Both effects hold up net of each other (era +0.0048/yr, length
   -0.026/season, both highly significant). (finding #7)
-- Genre net of era+length: Animation genuinely up (+0.23), Documentary /
-  Biography down; mainstream Drama/Comedy/Crime/Action ~neutral. Genre
-  matters less than a show's age and length. (finding #8)
+- Genre net of era+length: Animation genuinely up (+0.23), Adventure down;
+  mainstream Drama/Comedy/Crime/Action ~neutral. Genre matters less than a
+  show's age and length. (finding #8)
+- 🟡 Multiplicity: 16 genre dummies are tested at once, so ~1 raw flag is
+  expected by chance. Only Animation and Adventure survive Bonferroni;
+  Documentary, Romance and Thriller survive Benjamini-Hochberg; **Biography
+  survives neither and was dropped from the prose**, having been reported as
+  a real effect in the first draft. (finding #11)
 
 ## 6. Trajectory shapes  [🟢]
 - "Jumped the shark" (rise-then-fall, peak mid-run) is the single most common

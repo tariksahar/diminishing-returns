@@ -135,7 +135,7 @@ averaging a 6.4 against a 9.0 for everything that came before.
 
 To test it we took every show that has actually finished and set its final
 season against the rest of its run. The result comes out almost exactly even.
-**50.6%** have a weaker final season, **49.2%** a stronger one, and the middle
+**50.5%** have a weaker final season, **49.2%** a stronger one, and the middle
 of the pack moves by essentially nothing. There is no curse. On average, a
 final season is just another season.
 
@@ -155,12 +155,29 @@ rare — and it keeps landing on the shows people actually cared about.
 The bulk of the distribution sits on zero; the curse is that red left tail, and
 it stays a minority wherever the line is drawn.
 
-Which might be the entire trick. (This part is interpretation, not something
-the numbers prove.) The shows that fall are the shows *everyone* watched fall.
-No group chat ever erupted over some quiet drama that slipped a point in season
-four. When your evidence is only the collapses loud enough to make noise,
-"final seasons are cursed" hardens into law, while the seven-in-eight shows
-that ended perfectly fine never come up.
+Which might be the entire trick. And this part we can actually check.
+
+Sort every show by how many people voted on it, the best proxy we have for how
+many watched. The belief gets truer as the audience gets bigger. Among the most
+obscure shows in the data, 15% clearly decline. Among the sixty household names,
+the ones carrying more than half a million votes, it is **43%**. Nearly half.
+The final-season curse tracks the same way: 12% for the quiet shows, 24% for the
+famous ones. The climb is smooth at every step, and we tried three ways to break
+it: that it was simply noisier data on obscure shows, that it was the length
+effect wearing a disguise, that it was age and length together. It survived all
+three.
+
+So the belief isn't stupid. It is an accurate description of a different
+dataset. No group chat ever erupted over a quiet drama that slipped a point in
+season four; the shows you have watched all the way to the end are the famous
+ones, and the famous ones really do decline. You never formed your opinion from
+a random sample of television. Nobody has.
+
+One honesty note before we move on. We can't point the arrow here. A show that
+ends badly is precisely the show people pile in to rate, so fame and
+disappointment feed on each other, and this data can't say which came first.
+What it can say is descriptive, and it is enough: "fewer than one in six" was
+never a statement about your shows.
 
 ## 5. Decline is real — just not where you're looking
 
@@ -188,9 +205,13 @@ plateau, then sag.
 
 **And genre?** Mostly a red herring. Hold age and length constant and the giants
 of the schedule, drama and comedy and crime and action, come out flat, none of
-them cursed or blessed by their label. Only a couple of categories truly break
-from the pack: animation quietly climbs, those long-running cartoons and anime
-that sharpen with age, while documentary and biography fade.
+them cursed or blessed by their label. Testing sixteen genres at once means
+roughly one will look meaningful by pure luck, so we raised the bar to account
+for that, and only two categories clear it: animation quietly climbs, those
+long-running cartoons and anime that sharpen with age, while adventure drifts
+the other way. Documentary, romance and thriller probably belong on that list
+too, on a slightly more forgiving test. Biography looked like a decliner until we
+applied the correction, and then it didn't.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../figures/dark/fig05_era_length_genre.png">
@@ -199,8 +220,9 @@ that sharpen with age, while documentary and biography fade.
 
 **Figure 5.** One regression, every factor at once, so each effect is what
 remains after the others are held fixed. Length and age each survive that test.
-Almost every genre does not: the grey intervals straddle zero, meaning the
-label tells you nothing about which way a show will go.
+Almost no genre does: grey marks the estimates that fail to clear the bar once
+you account for testing sixteen genres at once, and that is fourteen of the
+sixteen.
 
 "Do shows decline?" finally has an honest answer. Some do, but less because
 they got worse than because of how old they are, and how long they refused to
@@ -327,6 +349,14 @@ shorter, so they might be one discovery in three costumes. We pulled them apart
 with a model that holds the others fixed, and both age and length survived on
 their own. Two real forces, not a single confound in disguise.
 
+**How firm is "16.9%", really?** Each show's trend is measured, not known, so a
+show sitting near the line could fall on either side of it by luck. At the level
+of one show that bites: half our "clear decliners" can't be shown to have lost a
+*full* half point rather than simply lost ground. Across 3,234 shows it mostly
+cancels, and what doesn't cancel works against us rather than for us, because
+the flat middle is the only group with two edges to leak across. Correcting for
+it moves the headline down about a point, not up.
+
 **Where the data thins out.** One pattern — shows that dip and then "find
 themselves" again — looked solid until we noticed that a show's late episodes
 are precisely its *least*-voted ones (audiences thin out; only the diehards
@@ -389,8 +419,10 @@ analysis like this can claim. We can map *where* television ratings move, and
 
 Back to your show, then. The one you picked in the first paragraph.
 
-It might genuinely have fallen apart. One in six do, and someone has to be that
-one. But the odds are against it, and there's a fair chance your show is *Lost*.
+It might genuinely have fallen apart. One in six do, and if you picked a
+household name, closer to two in five — section 4 was honest about that, and it
+means this is a real possibility rather than a long shot. But the odds are still
+against it, and there's a fair chance your show is *Lost*.
 
 If any series is shorthand for betrayal, it's that one: six seasons of
 questions, an ending people have been arguing about since 2010, the standing

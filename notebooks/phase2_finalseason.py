@@ -49,9 +49,18 @@ print()
 # Count each direction directly. Deriving "higher" as len(res) - declining
 # silently folds exact ties into the risers, which is how the published 49.4%
 # came to be 0.2 points too high.
-declining = (res["delta"] < 0).sum()
-rising = (res["delta"] > 0).sum()
-level = (res["delta"] == 0).sum()
+#
+# And compare against a TOLERANCE, not against exact zero. A tie means two
+# means of one-decimal ratings are equal as rationals, which float arithmetic
+# often cannot represent: four such series land on +/-1e-15 instead of 0.0.
+# Testing `== 0` counted 6 ties when there are 10, and `to_json`'s default
+# 10-decimal rounding then reported 8 to anything reading the exported file --
+# three different answers to one question, all of them artifacts of how zero
+# was compared. Anything below this tolerance is zero at the data's precision.
+LEVEL_TOL = 1e-9
+declining = (res["delta"] < -LEVEL_TOL).sum()
+rising = (res["delta"] > LEVEL_TOL).sum()
+level = (res["delta"].abs() <= LEVEL_TOL).sum()
 print(f"final season LOWER than the rest:  {declining:,}  ({100*declining/len(res):.1f}%)")
 print(f"final season HIGHER than the rest: {rising:,}  ({100*rising/len(res):.1f}%)")
 print(f"exactly level:                     {level:,}  ({100*level/len(res):.1f}%)")
