@@ -1,3 +1,8 @@
+---
+title: Report Outline
+description: The structure of the report, with each finding's reliability tier.
+---
+
 # Report Outline — "Do TV Shows Really Decline?"
 
 Working skeleton for the final write-up. This is a plan, not the prose: it

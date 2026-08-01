@@ -1,0 +1,318 @@
+/* Site styling for the GitHub Pages build.
+ *
+ * The colour tokens are the ones notebooks/figstyle.py validated for the
+ * figures (lightness band, chroma floor, Machado-2009 CVD separation, WCAG
+ * contrast against the chart surface). Reusing them here is not decoration:
+ * the nine figures are drawn on #fcfcfb / #1a1a19, so the page has to be that
+ * colour or every figure reads as a pasted-in grey block.
+ */
+
+:root {
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --grid: #e1e0d9;
+  --axis: #c3c2b7;
+  --accent: #2a78d6;
+  --accent-quiet: #eef4fc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --muted: #898781;
+    --grid: #2c2c2a;
+    --axis: #383835;
+    --accent: #3987e5;
+    --accent-quiet: #16202c;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  /* Serif for the body: these pages are 4,000-word essays, not UI. */
+  font-family: Charter, "Bitstream Charter", "Iowan Old Style", Georgia, Cambria,
+               "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.65;
+  text-rendering: optimizeLegibility;
+}
+
+/* --- chrome ------------------------------------------------------------- */
+
+.site-header,
+.site-footer,
+.site-nav {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+}
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-bottom: 1px solid var(--grid);
+}
+
+.site-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.site-nav a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-title:hover {
+  color: var(--accent);
+}
+
+/* --- body --------------------------------------------------------------- */
+
+.prose {
+  /* Figures are allowed the full 46rem; text is held to a readable measure. */
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.prose > p,
+.prose > ul,
+.prose > ol,
+.prose > h2,
+.prose > h3,
+.prose > h4,
+.prose > blockquote {
+  max-width: 34rem;
+}
+
+.prose h1 {
+  font-size: 2.35rem;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  margin: 0 0 0.6rem;
+  max-width: 30rem;
+}
+
+/* The essay's standfirst is an h3 immediately under the h1. */
+.prose h1 + h3 {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0 0 2.5rem;
+  max-width: 32rem;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  margin: 3rem 0 1rem;
+}
+
+.prose h3 {
+  font-size: 1.15rem;
+  margin: 2.25rem 0 0.75rem;
+}
+
+.prose a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.prose strong { font-weight: 700; }
+
+.prose blockquote {
+  margin: 1.75rem 0;
+  padding: 0.1rem 0 0.1rem 1.15rem;
+  border-left: 2px solid var(--axis);
+  color: var(--ink-2);
+  font-size: 0.95rem;
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--grid);
+  margin: 3rem 0;
+}
+
+/* --- figures ------------------------------------------------------------ */
+
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 2rem auto 0.75rem;
+}
+
+/* Figure captions are the bold "**Figure 1.**" paragraph after each image.
+   Nothing in the markdown marks them, so they are matched structurally. */
+.prose picture + p,
+.prose p > img + em {
+  font-size: 0.92rem;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.prose picture + p {
+  max-width: 34rem;
+  margin: 0 auto 2.5rem;
+}
+
+/* --- tables ------------------------------------------------------------- */
+
+.table-scroll,
+.prose table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.prose table {
+  border-collapse: collapse;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 0.95rem;
+  margin: 1.75rem 0 2rem;
+  width: 100%;
+}
+
+.prose th,
+.prose td {
+  border-bottom: 1px solid var(--grid);
+  padding: 0.6rem 0.9rem 0.6rem 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose th {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom-color: var(--axis);
+}
+
+/* --- code --------------------------------------------------------------- */
+
+.prose code {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.875em;
+  background: var(--accent-quiet);
+  padding: 0.12em 0.35em;
+  border-radius: 3px;
+}
+
+.prose pre {
+  background: var(--accent-quiet);
+  border: 1px solid var(--grid);
+  border-radius: 4px;
+  padding: 0.9rem 1rem;
+  overflow-x: auto;
+  font-size: 0.9rem;
+  max-width: 34rem;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+}
+
+/* --- landing page ------------------------------------------------------- */
+
+.lede {
+  font-size: 1.3rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 32rem;
+}
+
+.verdict {
+  font-size: 1.3rem;
+  line-height: 1.5;
+  max-width: 32rem;
+}
+
+.reads {
+  list-style: none;
+  padding: 0;
+  margin: 2.5rem 0 0;
+  max-width: 34rem;
+}
+
+.reads li {
+  border-top: 1px solid var(--grid);
+  padding: 1.15rem 0;
+}
+
+.reads a {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.reads a:hover { text-decoration: underline; }
+
+.reads p {
+  margin: 0.3rem 0 0;
+  font-size: 0.95rem;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+/* --- footer ------------------------------------------------------------- */
+
+.site-footer {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 3.5rem;
+  border-top: 1px solid var(--grid);
+  font-size: 0.9rem;
+  color: var(--ink-2);
+}
+
+.site-footer a { color: var(--accent); }
+
+.site-footer .fine {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+@media (max-width: 34rem) {
+  body { font-size: 1.06rem; }
+  .prose { padding-top: 1.75rem; }
+  .prose h1 { font-size: 1.85rem; }
+  .prose h2 { font-size: 1.3rem; }
+  .lede, .verdict { font-size: 1.15rem; }
+}

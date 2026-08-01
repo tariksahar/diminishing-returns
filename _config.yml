@@ -1,0 +1,62 @@
+# GitHub Pages configuration.
+#
+# WHY THE SITE IS BUILT FROM THE REPOSITORY ROOT, NOT FROM /docs
+#
+# docs/essay.md points at its figures with `../figures/dark/fig01_*.png` --
+# the same relative paths GitHub's own markdown view resolves. Serving the site
+# from /docs would make docs/ the site root, put figures/ outside the site
+# entirely, and 404 all nine figures in both themes. The only ways out are to
+# duplicate 3.9 MB of PNGs into docs/ (which phase3_figures.py would then not
+# regenerate -- exactly the silent drift this project writes tests against) or
+# to rewrite the paths (which breaks the GitHub view). Building from the root
+# costs one index.md and keeps every existing path correct in both places.
+#
+# For the same reason: do NOT set `permalink: pretty`. It would render the
+# essay at /docs/essay/ instead of /docs/essay.html, and `../figures/` would
+# resolve to /docs/figures/ -- every figure broken, silently, on the site only.
+
+title: Do TV Shows Really Decline?
+tagline: What 192,720 IMDb episode ratings say about television's most durable complaint
+description: >-
+  An analysis of 192,720 episode ratings from 3,234 television series, testing
+  the belief that shows decline over their run. Fewer than one in six do.
+author: Tarık Şahar
+lang: en
+
+url: https://tariksahar.github.io
+baseurl: /diminishing-returns
+repository: tariksahar/diminishing-returns
+
+# Shown when a page is shared on social media, via jekyll-seo-tag.
+image: /diminishing-returns/assets/social-card.png
+
+plugins:
+  - jekyll-relative-links   # turns [text](decisions.md) into a link to the built page
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+# Everything that is code, data or tooling rather than something to read.
+exclude:
+  - .claude/
+  - .github/
+  - .venv/
+  - .pytest_cache/
+  - data/
+  - notebooks/
+  - src/
+  - tests/
+  - docs/technical_report.tex
+  - requirements.txt
+  - requirements-dev.txt
+  - .gitattributes
+  - README.md
+  - DATA_LICENSE.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor/

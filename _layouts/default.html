@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'en' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The figures ship in a light and a dark set and are served by the reader's
+       own theme via <picture>. Declaring both here means the page around them
+       switches with them instead of stranding a dark chart on a white page. -->
+  <meta name="color-scheme" content="light dark">
+  {% seo %}
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="site-title" href="{{ '/' | relative_url }}">Do TV Shows Really Decline?</a>
+    <nav class="site-nav">
+      <a href="{{ '/docs/essay.html' | relative_url }}">Essay</a>
+      <a href="{{ '/docs/technical_report.html' | relative_url }}">Report</a>
+      <a href="https://github.com/{{ site.repository }}">Code</a>
+    </nav>
+  </header>
+
+  <main class="prose">
+    {{ content }}
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      A data analysis project by
+      <a href="https://github.com/tariksahar">Tarık Şahar</a>,
+      Istanbul Technical University.
+      Source, data and full decision log on
+      <a href="https://github.com/{{ site.repository }}">GitHub</a>.
+    </p>
+    <p class="fine">
+      Code and written analysis under MIT. Ratings from the
+      <a href="https://datasets.imdbws.com/">IMDb public datasets</a>, which
+      remain IMDb's and are used here for personal, non-commercial purposes.
+    </p>
+  </footer>
+</body>
+</html>
