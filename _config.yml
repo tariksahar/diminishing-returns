@@ -27,8 +27,8 @@ url: https://tariksahar.github.io
 baseurl: /diminishing-returns
 repository: tariksahar/diminishing-returns
 
-# Shown when a page is shared on social media, via jekyll-seo-tag.
-image: /diminishing-returns/assets/social-card.png
+twitter:
+  card: summary_large_image
 
 plugins:
   - jekyll-relative-links   # turns [text](decisions.md) into a link to the built page
@@ -40,6 +40,13 @@ defaults:
       path: ""
     values:
       layout: default
+      # The card every unfurled link shows. jekyll-seo-tag reads `image` off the
+      # page, not off the site, so a top-level `image:` key here is silently
+      # ignored -- it has to come through `defaults` to reach every page. The
+      # path stays site-root-relative because seo-tag runs it through
+      # `absolute_url`, which prepends url + baseurl; writing the baseurl in
+      # here too would produce /diminishing-returns/diminishing-returns/.
+      image: /assets/social-card.png
 
 # Everything that is code, data or tooling rather than something to read.
 exclude:
