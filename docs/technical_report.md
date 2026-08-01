@@ -1,3 +1,8 @@
+---
+title: "Do Television Series Decline Over Their Run?"
+description: Evidence from 192,720 IMDb episode ratings across 3,234 series.
+---
+
 # Do Television Series Decline Over Their Run? Evidence from 192,720 IMDb Episode Ratings
 
 **Tarık Şahar** · Istanbul Technical University, Data Science and Analytics
@@ -430,7 +435,7 @@ surely as votes track decline, so the arrow cannot be pointed, and fame cannot
 be said to cause anything here.
 
 What survives is descriptive. The series the
-belief is drawn from do not behave like the typical series, and "fewer than one
+belief is drawn from do not behave like the typical series, and "about one
 in six" is not a statement about them. This is offered as a reconciliation
 rather than a retraction: §4.1 remains the correct answer to "do series
 decline", and this section explains why an honest viewer with a different

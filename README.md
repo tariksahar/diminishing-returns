@@ -1,11 +1,14 @@
 # Do TV Shows Really Decline?
 
+[![tests](https://github.com/tariksahar/diminishing-returns/actions/workflows/tests.yml/badge.svg)](https://github.com/tariksahar/diminishing-returns/actions/workflows/tests.yml)
+[![read the essay](https://img.shields.io/badge/read-the%20essay-2a78d6)](https://tariksahar.github.io/diminishing-returns/docs/essay.html)
+
 Everyone knows television declines: shows arrive full of promise, spend their
 best ideas early, and coast downhill to a finish nobody asked for.
 
 I tested that belief against **192,720 episode ratings from 3,234 shows**.
 
-**It's mostly false.** Fewer than one in six shows clearly declines. The largest
+**It's mostly false.** Only about one in six shows clearly declines. The largest
 group barely moves at all, more shows rise than fall, and the moment the belief
 expects a collapse — the finale — is usually a show's *peak*.
 
@@ -31,6 +34,10 @@ in shows that ran too long, in shows that are simply old, and in the handful of
 shows famous enough for everyone to have an opinion about.
 
 ## Read it
+
+Everything below also reads on the web at
+**[tariksahar.github.io/diminishing-returns](https://tariksahar.github.io/diminishing-returns/)**,
+which is the better place for the essay.
 
 - **[The essay](docs/essay.md)** — *Your Favourite Show Probably Didn't
   Decline*: the full argument in plain language, with all nine figures. Start
@@ -78,6 +85,12 @@ A few things this project deliberately did the harder way:
   colour-blind separation and contrast (Machado-2009 simulation, OKLab ΔE). That
   check caught a pair of hues that were genuinely too close and would otherwise
   have shipped.
+- **The conventions are enforced, not just stated.** Every published number is
+  recomputed from the data by a [test suite](tests/) that runs on each push, and
+  the rules that only existed as comments — never put these two colours in one
+  chart, never derive a share as `100 - other` — are now tests that fail. Each
+  of those guards exists because the mistake it catches had already happened
+  once.
 
 ## Reproducing it
 
@@ -126,10 +139,12 @@ essay can always be rebuilt exactly as published.
 
 ```
 data/processed/   the built episode table + one JSON per analysis
-docs/             the essay, the decision log, the outline
-figures/          the nine report figures (fig01 … fig09)
+docs/             the essay, the technical report, the decision log, the outline
+figures/          the nine report figures (fig01 … fig09), in three renderings
 notebooks/        one script per question, named by phase
 src/build.py      raw IMDb tables -> the analysis dataset
+tests/            recomputes every published number from data/processed/
+index.md          landing page for the GitHub Pages site (_config.yml, _layouts/)
 ```
 
 Figures are produced by `notebooks/phase3_figures.py`, styled from
@@ -160,7 +175,8 @@ measure *where* ratings move and *how much* — never *why*.
 The code and the written analysis are [MIT licensed](LICENSE) — use them freely
 with attribution. **The data is not mine to license:** IMDb's datasets remain
 IMDb's, offered for personal and non-commercial use, and the derived tables in
-`data/processed/` inherit those terms.
+`data/processed/` inherit those terms. [`DATA_LICENSE.md`](DATA_LICENSE.md)
+spells out which files fall under which.
 
 ---
 

@@ -63,6 +63,49 @@ def test_the_headline_three_way_split(slopes):
     assert round(100 * (s >= CLEAR).mean(), 1) == 25.7
 
 
+def test_the_headline_gloss_is_about_one_in_six_not_fewer(slopes):
+    """The verbal shorthand for 16.9%, checked against the fraction it claims.
+
+    Every document glossed the headline as "fewer than one in six". It is not:
+    one sixth of 3,234 shows is 539 and the clear decliners number 545, so the
+    share sits just *above* one in six, not below. A gloss is not decoration --
+    it is the version of the finding that travels, and this one travelled onto
+    the README's first screen and into the repository description.
+
+    The number was always right; only the sentence around it was wrong, which
+    is exactly the failure the essay's §7 warns about. The wording is pinned
+    here so it cannot drift back if the threshold or the filters ever move the
+    share to the other side of 1/6 -- at which point this test fails and the
+    prose gets revisited deliberately.
+    """
+    from pathlib import Path
+
+    s = slopes["slope"]
+    n_decline = int((s <= -CLEAR).sum())
+    one_sixth = len(s) / 6
+    assert n_decline > one_sixth, (
+        f"{n_decline} clear decliners against a one-in-six mark of "
+        f"{one_sixth:.1f}: 'fewer than one in six' would now be true and the "
+        "prose says 'about'"
+    )
+
+    # decisions.md is deliberately absent: it is the record of what went wrong
+    # and has to be able to quote the wrong wording, exactly as it quotes the
+    # superseded 49.4% elsewhere. Everything here is a document that states the
+    # finding rather than its history.
+    published = ["README.md", "index.md", "docs/essay.md",
+                 "docs/technical_report.md", "docs/technical_report.tex"]
+    offenders = []
+    for name in published:
+        # The claim wraps across lines in several of these files.
+        text = " ".join(Path(name).read_text(encoding="utf-8").split())
+        if "fewer than one in six" in text.lower():
+            offenders.append(name)
+    assert not offenders, (
+        "the share is above one in six, so this gloss is false: " f"{offenders}"
+    )
+
+
 def test_the_median_show_drifts_slightly_up(slopes):
     """The essay's "the median show doesn't sag at all. It drifts slightly up"."""
     assert round(float(slopes["slope"].median()), 3) == 0.109

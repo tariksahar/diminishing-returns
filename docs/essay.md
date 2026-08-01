@@ -1,3 +1,8 @@
+---
+title: Your Favourite Show Probably Didn't Decline
+description: What 192,720 IMDb episode ratings say about television's most durable complaint.
+---
+
 # Your Favourite Show Probably Didn't Decline
 
 ### What 192,720 episode ratings say about television's most durable complaint
@@ -39,8 +44,7 @@ pilot and the finale. Do that for all 3,234 shows and the belief falls apart on
 the very first count:
 
 - A *clear* decline, meaning the show gives up at least half a rating point
-  across its whole run, turns up in just **16.9%** of shows. Fewer than one in
-  six.
+  across its whole run, turns up in just **16.9%** of shows. About one in six.
 - The largest group by far, **57.4%**, is essentially flat: no real rise, no
   real fall.
 - **25.7%** clearly rise, judged by that same half-point bar. Climbers
@@ -176,7 +180,7 @@ a random sample of television. Nobody has.
 One honesty note before we move on. We can't point the arrow here. A show that
 ends badly is precisely the show people pile in to rate, so fame and
 disappointment feed on each other, and this data can't say which came first.
-What it can say is descriptive, and it is enough: "fewer than one in six" was
+What it can say is descriptive, and it is enough: "about one in six" was
 never a statement about your shows.
 
 ## 5. Decline is real — just not where you're looking

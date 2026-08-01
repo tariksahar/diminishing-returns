@@ -1,3 +1,8 @@
+---
+title: Decision & Deferred-Task Log
+description: Every methodological choice, why it was made, and the traps caught along the way.
+---
+
 # Decision & Deferred-Task Log
 
 A running record of the design decisions we've locked in and the things we've
@@ -364,7 +369,7 @@ vote counts, which is why four of Game of Thrones' six most-voted episodes are
 season-8 ones. Decline raises votes as surely as votes track decline, so the
 arrow cannot be pointed and **no causal claim is available here**. What
 survives is descriptive: the series the belief is
-drawn from do not behave like the typical series, and "fewer than one in six"
+drawn from do not behave like the typical series, and "about one in six"
 is not a statement about them.
 
 **Now reflected everywhere — RESOLVED.** It was deliberately logged here first:
@@ -960,6 +965,41 @@ essay had already been through a verification pass over its named-show claims;
 this number was never in that pass because it did not look like a claim. That
 is the case for tests over care: care is what checks the things that look like
 they need checking.
+
+### The headline's gloss was wrong: "fewer than one in six" is above one in six
+
+Found while preparing the repository for a wider audience, which is the first
+time anyone asked what the front page's *first sentence* actually asserts.
+
+The clear-decline share is 16.9%, and every document glossed it as **"fewer than
+one in six"**. One sixth is 16.67%. The share is 545 shows out of 3,234 against
+a one-in-six mark of 539 — six shows *above* the fraction it claimed to be
+below. Corrected to **"about one in six"** in the README, the essay (twice —
+the claim and the later self-quote), the technical report in both formats, and
+this log.
+
+The number was never wrong. Nothing recomputes, no figure changes, no
+conclusion moves. What was wrong was the sentence that carries the number when
+the number is not present — and that sentence had the widest distribution of
+anything in the project: the README's first screen, the repository description,
+and the text of every link preview the essay would ever generate.
+
+Two things this says that the earlier corrections did not:
+
+- **A verbal gloss is a claim, and it was never tested.** The suite pinned
+  `16.9`, `57.4`, `25.7` from the first run. It had no opinion about the English
+  sentence next to them, because a gloss does not look like a number. This is
+  the third time in this log that the thing which escaped scrutiny is the thing
+  that did not look like it needed any.
+- **Rounding hides sign.** 16.85% rounds to 16.9%, and *both* look comfortably
+  like "one in six" at a glance. The error is only visible if the fraction is
+  actually evaluated — 1/6 = 0.1667 — which is precisely the arithmetic nobody
+  does when a phrase reads as smooth prose.
+
+`test_the_headline_gloss_is_about_one_in_six_not_fewer` now checks the count
+against `n/6` *and* greps the five published documents for the old phrasing. If
+a filter or threshold ever moves the share back under one sixth, the test fails
+and the wording gets revisited on purpose rather than being right by accident.
 
 ## Language convention
 
