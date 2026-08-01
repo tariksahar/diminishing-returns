@@ -3,3 +3,11 @@ data/raw/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+.pytest_cache/
+
+# Local Jekyll build of the GitHub Pages site. The site is built by GitHub from
+# the committed sources; nothing under _site/ should ever be committed.
+_site/
+.jekyll-cache/
+.jekyll-metadata
+Gemfile.lock
