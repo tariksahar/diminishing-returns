@@ -77,6 +77,26 @@ def test_the_headline_gloss_is_about_one_in_six_not_fewer(slopes):
     here so it cannot drift back if the threshold or the filters ever move the
     share to the other side of 1/6 -- at which point this test fails and the
     prose gets revisited deliberately.
+
+    WHAT THIS DOES NOT COVER -- read before trusting it.
+
+    The phrase lived on six surfaces. Five are files and are checked below. The
+    sixth is the **GitHub repository description**, which is not a file in this
+    repository, is edited through GitHub rather than through a commit, and
+    feeds the repository card's og:description. `pytest` cannot see it, and no
+    amount of care here will change that.
+
+    A CI step calling the API was considered and rejected. The fault it would
+    guard against -- someone edits the description and does not update the
+    prose -- involves no commit, so CI would not run at the moment it happens;
+    it would instead fail unrelated pushes for a value nobody touched, and it
+    would end the suite's one real guarantee, that it runs on a fresh clone
+    with no network and no raw data.
+
+    So that surface is handled by procedure, not by code. The procedure, with
+    the canonical text to copy from, is in docs/decisions.md under "Changing
+    the headline claim". Treating an unautomatable surface as automated is
+    worse than leaving it visibly manual.
     """
     from pathlib import Path
 

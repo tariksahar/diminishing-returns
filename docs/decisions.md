@@ -1042,6 +1042,55 @@ This is the second time on this exact number that the correction pass fixed the
 instances it was looking at and left one it was not — the first was fig04
 computing `100 - pct_down` after the script was fixed.
 
+### Changing the headline claim: the six surfaces, and the one no test can reach
+
+The clear-decline share is glossed in words as well as printed as a number, and
+the words live in more places than the number does. Twice now the number stayed
+right while a sentence carrying it went wrong, so this is the checklist.
+
+**Five surfaces are guarded.** `test_the_headline_gloss_is_about_one_in_six_not_fewer`
+reads `README.md`, `index.md`, `_config.yml`, `docs/technical_report.md` and
+`docs/technical_report.tex` — plus `docs/essay.md` — and fails on the old
+phrasing. Change the claim and the test tells you what you missed. This log is
+deliberately exempt: it has to be able to quote what was wrong.
+
+**One surface is not guarded and cannot be.** The **GitHub repository
+description** is not a file here. It is edited through GitHub, it changes
+without a commit, and it feeds the repository card's `og:description` — the
+image and text every shared `github.com/...` link unfurls to. `pytest` has no
+access to it.
+
+A CI step calling `gh api repos/{owner}/{repo} --jq .description` was considered
+and rejected, for a reason worth keeping because it is easy to get backwards.
+The objection is not the token (a public repository's description reads without
+authentication, and Actions supplies `GITHUB_TOKEN` anyway). The objection is
+**timing**: the fault being guarded — the description edited, the prose
+forgotten — involves no commit, so CI would not run when it happens. It would
+run later, on unrelated pushes, failing them over a value nobody in that diff
+touched. And it would cost the suite its one real guarantee: that it runs on a
+fresh clone with no network and no raw data. A guard that misses its own
+scenario and fires on others trains people to ignore red builds.
+
+So it is manual, and written down instead of assumed.
+
+**The canonical description, to copy rather than retype:**
+
+```
+Testing television's most durable complaint against 192,720 IMDb episode ratings from 3,234 shows. Only about one in six declines.
+```
+
+Set it with:
+
+```bash
+gh api -X PATCH repos/tariksahar/diminishing-returns -f description="<the text above>" --jq .description
+```
+
+**Retyping from memory is the actual failure mode**, not forgetfulness in the
+abstract. Both faults on this sentence were produced by writing it out again
+instead of copying it: the original gloss, and its reappearance in
+`_config.yml` a few commits after being corrected everywhere else. The text
+above exists so the manual step is a copy, not a recollection.
+
 ## Language convention
 
 All code, comments, function/variable names, filenames and figure labels are in
