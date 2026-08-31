@@ -980,9 +980,30 @@ this log.
 
 The number was never wrong. Nothing recomputes, no figure changes, no
 conclusion moves. What was wrong was the sentence that carries the number when
-the number is not present — and that sentence had the widest distribution of
-anything in the project: the README's first screen, the repository description,
-and the text of every link preview the essay would ever generate.
+the number is not present.
+
+**The exact surfaces, established from git rather than memory**, because a
+correction record that misnames where a fault lived outlives the fault:
+
+| Surface | Entered | Left |
+|---|---|---|
+| `README.md` line 8, the third sentence on the page | `cb1bfcb`, 27 Jul | `aa0adf7` |
+| `docs/essay.md` — §2 claim and the §4 self-quote | with the draft | `aa0adf7` |
+| `docs/technical_report.md` — §4.7, wrapped across two lines | `f46095f` | `aa0adf7` |
+| `docs/technical_report.tex` — same passage | `f46095f` | `aa0adf7` |
+| `docs/decisions.md` — quoted | `8a6de60`, 30 Jul | `aa0adf7` |
+| GitHub repository description, and so the repo card's `og:description` | — | 1 Aug, via the API |
+
+It was **not** in `index.md`: that file did not exist until 1 August and was
+written after the correction. Nor was it in the essay page's own
+`og:description`, which comes from front matter written after the fix — the
+link-preview exposure was the *repository* card, not the essay's.
+
+Searching for it needs care. `git log -S "fewer than one in six"` is
+case-sensitive and misses the README, which capitalises it mid-sentence; `-G`
+works line by line and misses both report formats, where the phrase wraps.
+Joining lines before counting is what actually finds every instance:
+`git show <rev>:<file> | tr '\n' ' ' | grep -oic "fewer than one in six"`.
 
 Two things this says that the earlier corrections did not:
 
@@ -997,9 +1018,29 @@ Two things this says that the earlier corrections did not:
   does when a phrase reads as smooth prose.
 
 `test_the_headline_gloss_is_about_one_in_six_not_fewer` now checks the count
-against `n/6` *and* greps the five published documents for the old phrasing. If
-a filter or threshold ever moves the share back under one sixth, the test fails
+against `n/6` *and* greps the published documents for the old phrasing. If a
+filter or threshold ever moves the share back under one sixth, the test fails
 and the wording gets revisited on purpose rather than being right by accident.
+
+**And then it came straight back, in the same session that removed it.** The
+site's `_config.yml` was written a few commits later (`90c1db0`) and its
+site-wide `description:` said *"Fewer than one in six do"* — typed from memory
+while every corrected file sat one directory away. It went unnoticed for two
+days because the guard listed *documents*, and a config file did not look like
+one.
+
+It was latent rather than published: every page carries its own front-matter
+`description`, so no live page ever served it, and all five were verified clean
+before the fix. But a new page added without a description would have inherited
+it, and the fault was in the repository the whole time.
+
+The lesson is about the guard's unit, not about being more careful.
+"The published documents" was a list of the files that happened to be wrong the
+first time. The right unit is **every file that states the finding to a
+reader**, which includes site metadata, and `_config.yml` is now in the list.
+This is the second time on this exact number that the correction pass fixed the
+instances it was looking at and left one it was not — the first was fig04
+computing `100 - pct_down` after the script was fixed.
 
 ## Language convention
 

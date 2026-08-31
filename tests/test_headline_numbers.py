@@ -93,7 +93,16 @@ def test_the_headline_gloss_is_about_one_in_six_not_fewer(slopes):
     # and has to be able to quote the wrong wording, exactly as it quotes the
     # superseded 49.4% elsewhere. Everything here is a document that states the
     # finding rather than its history.
-    published = ["README.md", "index.md", "docs/essay.md",
+    #
+    # _config.yml is here because leaving it out let the phrase straight back
+    # in. The site-wide `description:` was written from memory in the same
+    # session that corrected everything else, and this check passed while the
+    # wrong gloss sat in the repository -- latent rather than live, because
+    # every page carries its own front-matter description, but one page without
+    # one would have published it. A list of "the documents" is the wrong unit:
+    # the unit is every file that states the finding to a reader, and site
+    # metadata does.
+    published = ["README.md", "index.md", "_config.yml", "docs/essay.md",
                  "docs/technical_report.md", "docs/technical_report.tex"]
     offenders = []
     for name in published:
