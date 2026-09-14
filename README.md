@@ -92,6 +92,54 @@ A few things this project deliberately did the harder way:
   of those guards exists because the mistake it catches had already happened
   once.
 
+## The same analysis, rebuilt in SQL
+
+Everything above was built in pandas. [`sql/`](sql/) builds it a second time,
+independently, in SQLite.
+
+- **The build.** [`build_episodes.sql`](sql/build_episodes.sql) turns the three
+  raw IMDb tables into the analysis dataset using joins, per-show aggregates for
+  the six inclusion rules, and a `ROW_NUMBER()` window for episode order. A test
+  compares the result with the pandas table value by value. All 192,720 rows
+  and all twelve columns match.
+- **The findings.** [`sql/analysis/`](sql/analysis/) recomputes every show's
+  trend and the published results built on it: the three-way split, the median,
+  the finale and final-season shares, where the best season falls, and the
+  popularity gradient. The regressions stay in Python, where the matrix algebra
+  belongs.
+
+The weighted trend line needs no loop and no matrix. Its slope is a ratio of
+sums, and computing sums is what `GROUP BY` does:
+
+```sql
+-- condensed from sql/analysis/show_slopes.sql
+-- x: position in the run (0-1), y: rating, w: sqrt(votes)
+SELECT show_tconst,
+       (SUM(w) * SUM(w*x*y) - SUM(w*x) * SUM(w*y))
+     / (SUM(w) * SUM(w*x*x) - SUM(w*x) * SUM(w*x)) AS slope
+FROM points
+GROUP BY show_tconst;
+```
+
+All 3,234 slopes agree with the numpy fit to within 5×10⁻¹¹.
+
+**It found a mistake the test suite could not.** The SQL compares ratings as
+whole tenths, and it found 91 season finales rated *exactly* at their season's
+average. The Python had compared in floating point, where an exact tie comes out
+as ±0.000000000000001, and it counted 23 of those ties as wins. So the published
+finale shares were a tenth and three tenths of a point too high. They are
+corrected above and everywhere else. The existing test had recomputed the number
+with the same comparison, so it reproduced the bug and passed. Only an
+implementation that did the arithmetic differently could see it. The full account
+is in the
+[decision log](docs/decisions.md#what-it-caught-the-finale-shares-were-726-and-716-and-they-are-725-and-713).
+
+```bash
+python sql/run_analysis.py   # the findings, from the committed data -- no download needed
+python sql/load_raw.py       # optional: raw dumps -> data/imdb.sqlite (about a minute, 1.4 GB)
+python sql/run_build.py      # optional: the build in SQL, with its filter funnel
+```
+
 ## Reproducing it
 
 Built with Python 3.14 on Windows. The raw IMDb dumps are not committed
@@ -118,9 +166,11 @@ Every script is run from the repository root.
 
 **Checking it.** The published numbers are covered by a test suite that
 recomputes them from `data/processed/` — the population and the inclusion
-filters, every figure in the findings table above, and the palette rule that
-keeps two indistinguishable colours out of the same chart. It runs against the
-committed processed data, so it works on a fresh clone without the raw dumps:
+filters, every figure in the findings table above, the same findings again
+through the SQL queries, the compiled report PDF's own text, and the palette
+rule that keeps two indistinguishable colours out of the same chart. It runs
+against the committed processed data, so it works on a fresh clone without the
+raw dumps (the one test that needs the local SQLite build skips itself):
 
 ```bash
 pip install -r requirements-dev.txt
@@ -142,6 +192,7 @@ data/processed/   the built episode table + one JSON per analysis
 docs/             the essay, the technical report, the decision log, the outline
 figures/          the nine report figures (fig01 … fig09), in three renderings
 notebooks/        one script per question, named by phase
+sql/              the build and the findings again, in SQLite
 src/build.py      raw IMDb tables -> the analysis dataset
 tests/            recomputes every published number from data/processed/
 index.md          landing page for the GitHub Pages site (_config.yml, _layouts/)
