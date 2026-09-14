@@ -71,12 +71,34 @@ def stylesheet():
         "<feColorMatrix values='0 0 0 0 0.14 0 0 0 0 0.13 0 0 0 0 0.17 0 0 0 .06 0'/></filter>"
         "<rect width='100%' height='100%' filter='url(%23n)'/></svg>"
     )
+    magnifier = (
+        "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' "
+        f"stroke='{INK.replace('#', '%23')}' stroke-width='2.6' stroke-linecap='square'>"
+        "<circle cx='10' cy='10' r='6.5'/><path d='M15 15l6 6'/></svg>"
+    )
     return f"""<style>
 @import url('https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&family=Azeret+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap');
 
 [data-testid="stAppViewContainer"] {{ background: {PAPER} url("{grain}"); }}
 [data-testid="stHeader"] {{ background: transparent; }}
 [data-testid="stMainBlockContainer"] {{ max-width: 1040px; padding-top: 2.25rem; padding-bottom: 4rem; }}
+
+/* The show search: a thick ink frame with a magnifier, so it reads as the way
+   into the page rather than as a settings dropdown. Streamlit gives the
+   bordered box no test id of its own, so it is reached by structure -- the
+   box is the second level under stSelectbox in Streamlit 1.63, which
+   app/requirements.txt pins. Focus prints a second, yellow impression offset
+   like the title's. */
+[data-testid="stSelectbox"] > div > div {{
+  border: 3px solid {INK} !important; border-radius: 0 !important;
+  background: {PAPER} url("{magnifier}") no-repeat 14px center / 22px 22px !important;
+  padding-left: 42px; min-height: 54px; transition: box-shadow .12s ease;
+}}
+[data-testid="stSelectbox"] > div > div:focus-within {{ box-shadow: 5px 4px 0 {YELLOW}; }}
+[data-testid="stSelectbox"] input {{ font-size: 19px; }}
+@media (prefers-reduced-motion: reduce) {{
+  [data-testid="stSelectbox"] > div > div {{ transition: none; }}
+}}
 
 .riso {{ color: {INK}; font-family: "Newsreader", Georgia, serif; }}
 .riso-mono {{ font-family: "Azeret Mono", ui-monospace, monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; }}
