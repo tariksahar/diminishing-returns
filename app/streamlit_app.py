@@ -56,13 +56,25 @@ if "show" not in st.session_state:
     requested = st.query_params.get("show", DEFAULT_SHOW)
     st.session_state["show"] = requested if requested in labels else DEFAULT_SHOW
 
+# index=None is what gives the box its clear (x) button: Streamlit only offers
+# one on a selectbox that is allowed to be empty. The value still starts on a
+# show, from the session state seeded above.
 show = st.selectbox(
     "Pick a show",
     ids,
+    index=None,
     key="show",
     format_func=labels.get,
     placeholder="Type a title",
 )
+
+if show is None:
+    # Cleared with the x: an empty search, waiting for a title.
+    st.query_params.pop("show", None)
+    show_html(riso.empty_state(len(ids)))
+    show_html(riso.footer())
+    st.stop()
+
 st.query_params["show"] = show
 
 page = lookup.page(show)

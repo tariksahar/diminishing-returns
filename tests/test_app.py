@@ -214,3 +214,56 @@ def test_skipping_the_guess_reveals_without_an_answer():
     next(b for b in app.button if b.label == "Skip the guess").click().run()
     assert revealed(app)
     assert "You skipped the guess." in "".join(block.value for block in app.markdown)
+
+
+def _contrast(a, b):
+    def luminance(hex_colour):
+        channels = [int(hex_colour.lstrip("#")[i:i + 2], 16) / 255 for i in (0, 2, 4)]
+        linear = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+        return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+    hi, lo = sorted([luminance(a), luminance(b)], reverse=True)
+    return (hi + 0.05) / (lo + 0.05)
+
+
+@pytest.mark.parametrize("name", ["LIGHT", "DARK"])
+def test_both_printings_are_legible(name):
+    """WCAG contrast for how each colour is actually used: running text in ink
+    on paper (4.5:1), and the verdict inks as marks on paper and as the ground
+    of the paper-coloured stamp lettering, which is large bold type (3:1). The
+    first light palette printed 'Clear decline' at 2.8:1."""
+    palette = getattr(riso, name)
+    assert _contrast(palette["ink"], palette["paper"]) >= 4.5
+    for ink in ("red", "blue"):
+        assert _contrast(palette[ink], palette["paper"]) >= 3.0, ink
+
+
+def test_markup_names_no_colour_directly(every_show):
+    """Colours come from CSS variables, so the dark printing reaches every
+    element. A literal hex in the markup would stay light-mode on black stock."""
+    page, episodes, context = every_show[0]
+    markup = (riso.masthead(page, True) + riso.chart(page, episodes)
+              + riso.verdict(page, episodes, context, guess=None) + riso.context_block(page, context)
+              + riso.footer() + riso.empty_state(3_234))
+    assert not re.search(r"#[0-9A-Fa-f]{6}\b", markup)
+    assert not re.search(r'\b(fill|stroke)="#', markup)
+
+
+def test_the_theme_config_carries_the_same_two_palettes():
+    import tomllib
+    config = tomllib.loads((APP_DIR.parent / ".streamlit" / "config.toml").read_text(encoding="utf-8"))
+    assert "base" not in config["theme"], "a base theme would pin every visitor to one printing"
+    for section, palette in (("light", riso.LIGHT), ("dark", riso.DARK)):
+        assert config["theme"][section]["backgroundColor"] == palette["paper"]
+        assert config["theme"][section]["textColor"] == palette["ink"]
+
+
+def test_clearing_the_search_shows_an_empty_page_and_picking_brings_it_back():
+    app = start()
+    app.selectbox[0].set_value(None).run()
+    assert not app.exception
+    content = "".join(b.value for b in app.markdown if not b.value.lstrip().startswith("<style>"))
+    assert "riso-empty" in content
+    assert "show" not in app.query_params
+    app.selectbox[0].set_value(BREAKING_BAD).run()
+    assert app.query_params["show"] == [BREAKING_BAD]
+    assert not revealed(app)
