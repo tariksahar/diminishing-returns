@@ -454,4 +454,4 @@ treated us along the way.
 ---
 
 *Still thinking of a different show? [Look it up](https://diminishing-returns.streamlit.app): all 3,234 are
-there. Make your guess before you scroll.*
+there, and the page makes you guess before it tells you.*
