@@ -7,3 +7,5 @@
 -r requirements.txt
 
 pytest~=9.0
+# Reads the committed technical_report.pdf, so a stale compile fails a test.
+pypdf~=6.14

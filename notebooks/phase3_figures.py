@@ -249,14 +249,19 @@ def fig03_finale_premium():
             series.append(r[-1] - r[:-1].mean())
     sf, sp, series = np.array(sf), np.array(sp), np.array(series)
 
+    # Tolerance, not `> 0`, for the reason given in phase2_finales.py: 91
+    # finales equal their season's mean exactly, float arithmetic puts some of
+    # them at +1e-15, and `> 0` drew those as wins -- 72.6% and 71.6% on this
+    # panel where the true shares are 72.5% and 71.3%.
+    TIE_TOL = 1e-9
     items = [
-        ("Season finale\nvs its own season", sf.mean(), 100 * (sf > 0).mean(), len(sf)),
-        ("Season premiere\nvs its own season", sp.mean(), 100 * (sp > 0).mean(), len(sp)),
-        ("Series finale\nvs its final season", series.mean(), 100 * (series > 0).mean(), len(series)),
+        ("Season finale\nvs its own season", sf.mean(), 100 * (sf > TIE_TOL).mean(), len(sf)),
+        ("Season premiere\nvs its own season", sp.mean(), 100 * (sp > TIE_TOL).mean(), len(sp)),
+        ("Series finale\nvs its final season", series.mean(), 100 * (series > TIE_TOL).mean(), len(series)),
     ]
     for label, mean, pct, n in items:
         print(f"  {label.replace(chr(10), ' '):<34} mean {mean:+.3f}  above {pct:.1f}%  n={n:,}")
-    print(f"  series finale drops >= 0.5: {100*(series <= -0.5).mean():.1f}%")
+    print(f"  series finale drops >= 0.5: {100*(series <= -0.5 + TIE_TOL).mean():.1f}%")
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=canvas(4.8))
     ypos = np.arange(3)[::-1]
@@ -363,7 +368,7 @@ def fig04_final_season_curse():
     # it swamps the plot and collides with the axis, and the caption states the
     # same figure, so it is dropped there.
     if not PAPER:
-        ax1.text(-1.78, top * 0.50, f"{100*(d <= -0.5).mean():.1f}% of ended shows",
+        ax1.text(-1.78, top * 0.50, f"{100*(d <= -0.5 + LEVEL_TOL).mean():.1f}% of ended shows",
                  ha="center", va="bottom", fontsize=12.5, fontweight="bold", color=RED)
         ax1.text(-1.78, top * 0.47, "lose half a point or more",
                  ha="center", va="top", fontsize=9.5, color=INK_2)

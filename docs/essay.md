@@ -98,14 +98,14 @@ It's the high point.
 
 Go season by season through all 3,234 shows and the season finale is, more
 often than not, the best episode in its season. It beats the rest of its own
-season **72.6%** of the time, by a quarter of a point on average. Shows save
+season **72.5%** of the time, by a quarter of a point on average. Shows save
 their strongest hour for last. And, tellingly, they don't do the reverse: the
 season premiere is thoroughly unremarkable, no better than some random
 mid-season episode. Television builds toward endings; it doesn't coast away
 from beginnings.
 
 A show's very last episode plays by the same rule. It lands *above* its final
-season's average **71.6%** of the time. Only about **one in ten** finales falls
+season's average **71.3%** of the time. Only about **one in ten** finales falls
 hard enough to count as a real collapse.
 
 <picture>

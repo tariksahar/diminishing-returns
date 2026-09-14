@@ -889,8 +889,9 @@ Three files under `tests/`, runnable with `pytest` from the repository root:
   inclusion filters against the output rather than trusting the build log.
 - `test_headline_numbers.py` — every figure in the README's findings table,
   recomputed from the parquet: the 16.9 / 57.4 / 25.7 split, the +0.109 median,
-  the +0.79 halves correlation and the 0.07 top-quartile give-back, the 72.6%
-  and 71.6% finale premiums, the final-season split, and the -0.026 / +0.0048
+  the +0.79 halves correlation and the 0.07 top-quartile give-back, the 72.5%
+  and 71.3% finale shares (72.6% and 71.6% until the SQL reproduction; see
+  below), the final-season split, and the -0.026 / +0.0048
   length and era coefficients. Plus the one that guards everything downstream:
   the stored `_phase2_slopes_full.json` must still match a fresh recompute.
 - Two tests were added later, with the closing pass, for the two claims that
@@ -1090,6 +1091,131 @@ abstract. Both faults on this sentence were produced by writing it out again
 instead of copying it: the original gloss, and its reappearance in
 `_config.yml` a few commits after being corrected everywhere else. The text
 above exists so the manual step is a copy, not a recollection.
+
+## The SQL reproduction
+
+### Why a second implementation, and what it covers
+
+`sql/` rebuilds the project in SQLite, next to the pandas version rather than
+instead of it. It has two layers, and the split between them is deliberate.
+
+- **The build** (`sql/load_raw.py`, `sql/build_episodes.sql`) re-implements
+  `src/build.py` from the raw IMDb dumps: the joins, rules 2-6 on a per-show
+  aggregate, the ongoing flag, and `overall_order` as a `ROW_NUMBER()` window.
+  `tests/test_sql_build.py` compares the result with `episodes.parquet` value by
+  value in all twelve columns. No row differs. The test needs the 1.4 GB local
+  database, so it skips on a fresh clone and in CI, and says why.
+- **The analysis** (`sql/analysis/`) starts from the committed parquet, loaded
+  into an in-memory database. Once the build is shown identical, starting there
+  loses nothing, and it means `tests/test_sql_analysis.py` runs in CI. It covers
+  every show's weighted slope (closed form, within 5e-11 of numpy), the headline
+  split and median, the finale shares, the final-season split, the best-season
+  location and the popularity gradient.
+
+The cross-sectional regressions (length, era, genre) stay in Python only. They
+are matrix computations, and writing them in SQL would demonstrate stubbornness
+rather than correctness.
+
+Two traps were handled on the way and are worth knowing about. 5,465 titles in
+`title.basics` begin with a literal double quote, so the loader splits on tabs
+by hand instead of using a quote-aware CSV reader. None of those shows reached
+the analysis set, so this did not change today's result. And `NOT (genres LIKE
+...)` is NULL, not true, when `genres` is NULL, so the genre rule wraps it in
+`COALESCE`. The 390 shows with no genre all fall at the vote threshold first,
+so that did not change the result either. Both are there so a data refresh
+cannot change it silently.
+
+### What it caught: the finale shares were 72.6% and 71.6%, and they are 72.5% and 71.3%
+
+A finale "beats its season" when its rating is above the mean of the season's
+other episodes. `finales.sql` tests that in integers: ratings in tenths,
+cross-multiplied (`finale * rest_n > rest_sum`). It found **91 season finales
+exactly level** with their season, 23 of them series finales. The Python
+computed `ratings[-1] - ratings[:-1].mean() > 0` in floating point, where an
+exact tie comes out as roughly ±1e-15. **23 of the 91 landed above zero and were
+counted as wins, 7 of them series finales.** Every season where the two methods
+disagreed was one of those ties. This was checked season by season against
+exact rational arithmetic (`fractions.Fraction`), not inferred from the totals.
+
+| Share | Published | Correct |
+|---|---|---|
+| Season finale beats its season | 72.6% | **72.5%** (9,370 / 12,931) |
+| Series finale rises | 71.6% | **71.3%** (2,199 / 3,082) |
+| Season premiere beats its season | 43.3% | **43.1%** |
+| Series finale falls 0.5 or more | 9.4% | **9.5%** |
+
+The last two are the same comparison at other boundaries, and neither had ever
+been pinned by a test. The means (+0.253, -0.040, +0.256) do not change, and
+neither does any conclusion or verbal gloss. The finale is still usually the
+peak, "nearly three times out of four" still holds, and "one in ten" still
+holds. Corrected in `phase2_finales.py`, `phase3_figures.py` (fig03 in all three
+render modes), `_phase2_finales.json`, the README, the essay, the technical
+report in both sources and the compiled PDF, the outline, and this log. Nothing
+outside the repository carried these numbers: the repository description,
+topics and social card were checked and never did.
+
+**This is the third time this log has recorded a float compared with zero, and
+the second time the lesson was already written down.** The 49.4% entry above
+ends with *"Never compare a float to zero to mean 'equal'"* and *"Fixing a bug
+in one place does not fix the same reasoning elsewhere"*. Both were right, and
+the finale script sat two files away with the same comparison. That correction
+fixed the final-season script and its figure. Nobody went looking for other
+places where a rating was compared with a mean of ratings.
+
+That sweep has now been done. Every comparison with 0 or with a threshold in
+`notebooks/` was checked for values sitting exactly on the boundary:
+
+- **Slopes:** none within 1e-9 of 0, ±0.5, ±1 or -0.3. A weighted fit is not a
+  ratio of small integers, so ties do not arise, and every slope-based share is
+  safe as computed.
+- **Final-season deltas:** one ended series lands exactly on -0.5. Its float
+  value happens to be exactly -0.5, so the published 12.6% was right. The
+  unpublished "mild drop" count in `phase2_finalseason.py` was 1,029 and is
+  1,026, because three negative-signed ties were counted as drops. Both that
+  script and fig04's callout now use the tolerance at the 0.5 boundary too.
+  fig04's output is byte-identical.
+- **`phase2_threshold.py` example screens:** 13 series sit exactly at ±0.25,
+  and none of them passes the screen's slope and vote filters. Left as is.
+
+**Why the existing tests did not catch it** is the general lesson here.
+`test_headline_numbers.py` recomputes every published number from the parquet,
+and its finale test was a faithful copy of the script's `> 0`. A recompute
+using the same method reproduces the same bug and passes. What found this was a
+second implementation that computed the comparison a different way, in
+integers. Reproducing a number is only a check if the reproduction is
+independent of the thing it checks. The finale tests now assert the
+tolerance-based share and the old `> 0` share side by side, as the final-season
+test does, so the gap stays visible.
+
+### Recompiling for this correction exposed a stale PDF: "fewer than one in six" was still in it
+
+The PDF was rebuilt locally this time, with MiKTeX's pdfLaTeX. The entry above
+on committing the PDF says this machine has no LaTeX toolchain, and that is no
+longer true. A different distribution could reflow the document, so before
+trusting the new build, the *unchanged* source (`HEAD`) was compiled first and
+its text compared with the committed PDF page by page. The layout matched: 16
+pages, with every page starting and ending on the same words.
+
+The text did not match, in one place. Page 11 of the committed PDF still read
+**"fewer than one in six"**. The gloss correction (`aa0adf7`, 1 Aug) edited
+`technical_report.tex` and never recompiled. The PDF was last built in
+`f46095f`, the day before. For six weeks the published PDF carried the wording
+that entry records as removed from "the technical report in both formats". This
+broke the rule written for exactly that case: a `.tex` change recompiles the PDF
+in the same commit. Every guard read the sources. None read the output.
+
+The corrected compile differs from the committed PDF in exactly seven places:
+the six finale figures on pages 1 and 7, and that gloss on page 11. Figure 5,
+extracted from the new PDF, shows 72.5 / 43.1 / 71.3.
+
+**The guard now reads the PDF.** `test_report_source.py` extracts the committed
+PDF's text (`pypdf`, added to `requirements-dev.txt`) and requires every number
+in `SHARED_NUMBERS` to appear in it, and "fewer than one in six", "72.6%" and
+"71.6%" not to. Put back, the old PDF fails six of those checks. Its docstring
+says what it cannot see: prose that carries no pinned number can still go
+stale. A source hash embedded in the PDF was considered and rejected, because
+the working copy's `.tex` has CRLF endings on Windows and LF in CI, so the same
+source would hash two ways.
 
 ## Language convention
 

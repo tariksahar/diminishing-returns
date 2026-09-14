@@ -25,8 +25,8 @@ A coupling-free test — regressing each show's second-half mean on its
 separately measured first-half mean — yields a correlation of +0.793 and a
 slope of 0.886 against a noise-only expectation of 0.983, implying a real but
 negligible extra decline of 0.07 rating points for the strongest starters.
-Season finales exceed the remainder of their own season 72.6% of the time, and
-series finales exceed their final season 71.6% of the time, so the moment the
+Season finales exceed the remainder of their own season 72.5% of the time, and
+series finales exceed their final season 71.3% of the time, so the moment the
 belief expects collapse is typically a local maximum. Among ended series the
 final season is weaker than the rest of the run in 50.5% of cases with a median
 change of -0.006, and only 12.6% lose half a point or more; this conclusion is
@@ -273,12 +273,12 @@ Restricting to seasons of at least four rated episodes (n = 12,931 seasons):
 
 | Contrast | Mean | Share above baseline |
 |---|---|---|
-| Season finale vs rest of its season | **+0.253** | **72.6%** |
-| Season premiere vs rest of its season | -0.040 | 43.3% |
-| Series finale vs its final season body (n = 3,082) | **+0.256** | **71.6%** |
+| Season finale vs rest of its season | **+0.253** | **72.5%** |
+| Season premiere vs rest of its season | -0.040 | 43.1% |
+| Series finale vs its final season body (n = 3,082) | **+0.256** | **71.3%** |
 
 Finales are systematically the strongest episode of their season, premieres are
-mildly below average, and the asymmetry is large. Only **9.4%** of series
+mildly below average, and the asymmetry is large. Only **9.5%** of series
 finales fall 0.5 points or more below their final season — the memorable
 "finale flop" is a one-in-ten event.
 

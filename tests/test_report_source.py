@@ -1,9 +1,9 @@
 """Lints on the technical report's two sources, and on their agreement.
 
-There is no LaTeX toolchain on this machine, so `technical_report.tex` is
-compiled by hand on Overleaf and every mistake in it costs a manual round trip.
-Two rounds were spent on faults that a few lines of parsing would have caught,
-so they are caught here instead:
+`technical_report.tex` is compiled by hand (on Overleaf while drafting, locally
+with MiKTeX's pdfLaTeX since the finale correction) and the PDF is committed, so
+every mistake in it costs a manual round trip. Two rounds were spent on faults
+that a few lines of parsing would have caught, so they are caught here instead:
 
   * a `\\label` placed after a `\\paragraph` inherits the enclosing SECTION
     number, so two such labels in one section both render as "Section 5". A
@@ -12,6 +12,9 @@ so they are caught here instead:
     perfectly sensible in the source.
   * the report exists as both `.tex` and `.md`, one document in two formats, and
     nothing checked that they quote the same numbers.
+
+And one fault that reading the sources could never catch: the committed PDF
+falling behind them. That is checked against the PDF's own text, at the end.
 
 Run from the repository root:  pytest
 """
@@ -83,7 +86,8 @@ def test_paragraph_labels_are_not_referenced_as_sections(tex):
 SHARED_NUMBERS = [
     "16.9", "57.4", "25.7",       # the headline split
     "50.5", "49.2", "12.6",       # the final-season split
-    "72.6", "71.6",               # the finale premia
+    "72.5", "71.3",               # the finale premia
+    "43.1",                       # the premiere share
     "43.3", "23.8",               # the two fame gradients
     "15.6", "60.4", "23.9",       # the noise-corrected split
     "0.189", "0.4238", "21.9",    # the estimation-error section
@@ -110,3 +114,37 @@ def test_the_withdrawn_biography_claim_stays_withdrawn(tex, md):
             f"{name}: Biography is named but no longer marked as surviving "
             "neither correction"
         )
+
+
+PDF = Path("docs/technical_report.pdf")
+
+
+@pytest.fixture(scope="module")
+def pdf_text():
+    """The committed PDF's text, whitespace-normalised so a number or phrase the
+    layout wrapped across lines still matches."""
+    pypdf = pytest.importorskip("pypdf")
+    pages = pypdf.PdfReader(PDF).pages
+    return " ".join(" ".join((page.extract_text() or "").split()) for page in pages)
+
+
+@pytest.mark.parametrize("number", SHARED_NUMBERS)
+def test_the_compiled_pdf_quotes_the_same_numbers(pdf_text, number):
+    """The PDF is compiled by hand and committed, so it can fall behind its
+    source without anything noticing -- and it did. The one-in-six gloss was
+    corrected in the .tex on 1 August and the PDF kept the old wording for six
+    weeks, because every check read the sources and nobody read the output.
+
+    This covers the numbers in SHARED_NUMBERS and the superseded phrasings
+    below. It does not prove the PDF matches the .tex in full: a change to prose
+    that carries no pinned number can still go stale. Recompiling in the same
+    change as any .tex edit is still the rule (docs/decisions.md)."""
+    assert number in pdf_text, f"{number} is in both sources but not in the compiled PDF"
+
+
+@pytest.mark.parametrize("superseded", [
+    "fewer than one in six",   # the headline gloss, corrected 1 Aug
+    "72.6%", "71.6%",          # the finale shares before the tie correction
+])
+def test_the_compiled_pdf_has_no_superseded_claims(pdf_text, superseded):
+    assert superseded not in pdf_text.lower(), f"the PDF still states {superseded!r}"

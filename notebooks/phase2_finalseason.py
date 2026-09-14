@@ -65,8 +65,10 @@ print(f"final season LOWER than the rest:  {declining:,}  ({100*declining/len(re
 print(f"final season HIGHER than the rest: {rising:,}  ({100*rising/len(res):.1f}%)")
 print(f"exactly level:                     {level:,}  ({100*level/len(res):.1f}%)")
 print()
-strong_curse = (res["delta"] <= -0.5).sum()
-mild_curse = ((res["delta"] < 0) & (res["delta"] > -0.5)).sum()
+# The same tolerance at the 0.5 boundary. One ended series lands exactly on
+# -0.5, and without it three exact ties were counted as mild drops.
+strong_curse = (res["delta"] <= -0.5 + LEVEL_TOL).sum()
+mild_curse = ((res["delta"] < -LEVEL_TOL) & (res["delta"] > -0.5 + LEVEL_TOL)).sum()
 print(f"clear curse (delta <= -0.5):  {strong_curse:,}  ({100*strong_curse/len(res):.1f}%)")
 print(f"mild drop (-0.5 < delta < 0): {mild_curse:,}  ({100*mild_curse/len(res):.1f}%)")
 print()

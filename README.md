@@ -23,7 +23,7 @@ expects a collapse — the finale — is usually a show's *peak*.
 |---|---|
 | "Shows decline over time" | Only **16.9%** clearly decline. **57.4%** are essentially flat, **25.7%** clearly rise. |
 | "A show's quality drains away" | A show's second half lands within **0.07** of a rating point of its first half, even for the strongest starters. |
-| "Finales ruin everything" | Season finales beat the rest of their season **72.6%** of the time. Series finales rise **71.6%** of the time. |
+| "Finales ruin everything" | Season finales beat the rest of their season **72.5%** of the time. Series finales rise **71.3%** of the time. |
 | "The final season is cursed" | Almost a coin flip: **50.5%** down, **49.2%** up. Only **12.6%** lose half a point or more. |
 | "It depends on the genre" | Genre barely matters. **Age and length** do: every extra season costs **0.026** of a rating point, every decade newer adds **0.048**. |
 | "The first season is always best" | The **last** season is the single best more often (**37%**) than the first (**27%**). |

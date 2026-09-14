@@ -1,1 +1,1 @@
-{"season_finale_premium": {"mean": 0.253, "median": 0.271, "pct_above": 72.6}, "season_premiere_premium": {"mean": -0.04, "pct_above": 43.3}, "series_finale_effect": {"mean": 0.256, "pct_up": 71.6, "pct_flop": 9.4}}
+{"season_finale_premium": {"mean": 0.253, "median": 0.271, "pct_above": 72.5}, "season_premiere_premium": {"mean": -0.04, "pct_above": 43.1}, "series_finale_effect": {"mean": 0.256, "pct_up": 71.3, "pct_flop": 9.5}}

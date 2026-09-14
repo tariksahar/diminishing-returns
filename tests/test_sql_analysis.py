@@ -4,9 +4,6 @@ Every query in sql/analysis/ runs against the committed episode table, loaded
 into an in-memory SQLite database, and must reproduce what the documents say.
 Unlike tests/test_sql_build.py this needs no raw data, so it runs in CI.
 
-One finding does not reproduce to the published decimal, on purpose -- see
-test_finales_exact_count_differs_from_the_published_float_count.
-
 Run from the repository root:  pytest
 """
 
@@ -50,36 +47,23 @@ def test_headline_three_way_split_and_median(conn):
     assert row["median_slope"] == 0.109
 
 
-def test_finales_exact_count_differs_from_the_published_float_count(conn):
-    """The published 72.6% and 71.6% count some exact ties as wins.
+def test_finales_beat_their_season_counted_in_integers(conn):
+    """72.5% of season finales win, 71.3% of series finales rise.
 
-    A finale "beats its season" when its rating is above the mean of the other
-    episodes. 91 season finales sit exactly on that mean. The Python computes
-    `finale - mean(rest) > 0` in floating point, where an exact tie comes out
-    as about +1e-15 or -1e-15 at random; 23 of the 91 land above zero and are
-    counted as wins, 7 of them series finales. The SQL compares integers
-    (ratings in tenths, cross-multiplied), so a tie is a tie and not a win.
-
-    Exact:      72.5% of season finales win, 71.3% of series finales rise.
-    Published:  72.6% and 71.6% -- the exact counts plus those 23 and 7 ties.
-
-    This pins both the exact figures and the explanation of the gap, so the
-    difference stays documented until the published numbers are corrected.
-    """
+    This query is what found that the figures were once published as 72.6% and
+    71.6%: 91 season finales sit exactly on their season's mean, and the float
+    comparison in the Python had counted 23 of them (7 series finales) as wins.
+    Compared as integers, a tie is a tie. The correction is recorded in
+    docs/decisions.md; the Python now uses a tolerance and agrees."""
     row = one_row(conn, "finales.sql")
-    seasons, series = row["seasons"], row["series_finales"]
-    assert seasons == 12_931
-    assert series == 3_082
+    assert row["seasons"] == 12_931
+    assert row["series_finales"] == 3_082
     assert row["season_finale_ties"] == 91
     assert row["series_finale_ties"] == 23
-
+    assert row["season_finale_wins"] == 9_370
+    assert row["series_finale_rises"] == 2_199
     assert row["pct_season_finale_wins"] == 72.5
     assert row["pct_series_finale_rises"] == 71.3
-
-    # Adding back exactly the ties that floating point called wins recovers
-    # the published figures.
-    assert round(100 * (row["season_finale_wins"] + 23) / seasons, 1) == 72.6
-    assert round(100 * (row["series_finale_rises"] + 7) / series, 1) == 71.6
 
 
 def test_final_season_is_a_coin_flip_with_ten_exact_ties(conn):

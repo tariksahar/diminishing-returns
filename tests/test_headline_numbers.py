@@ -159,30 +159,92 @@ def test_halves_of_a_show_track_each_other(episodes):
     assert round(top["second"].mean() - top["first"].mean(), 2) == -0.07
 
 
-def test_season_finales_beat_their_own_season(episodes):
-    """README: season finales win 72.6% of the time."""
-    premiums = []
+def season_contrasts(episodes):
+    """Per season of >= 4 episodes: the finale's and the premiere's premium over
+    the rest of that season, and whether it is the show's final season."""
+    rows = []
     for _, g in episodes.groupby("show_tconst"):
-        for _, season in g.groupby("season_number"):
+        last_season = g["season_number"].max()
+        for number, season in g.groupby("season_number"):
             season = season.sort_values("episode_number")
             if len(season) < MIN_SEASON_EP:
                 continue
             ratings = season["average_rating"].to_numpy(dtype=float)
-            premiums.append(ratings[-1] - ratings[:-1].mean())
-    assert round(100 * np.mean(np.array(premiums) > 0), 1) == 72.6
+            rows.append({
+                "finale": ratings[-1] - ratings[:-1].mean(),
+                "premiere": ratings[0] - ratings[1:].mean(),
+                "is_final_season": number == last_season,
+            })
+    return pd.DataFrame(rows)
 
 
-def test_series_finales_usually_rise(episodes):
-    """README: series finales rise 71.6% of the time."""
-    effects = []
-    for _, g in episodes.groupby("show_tconst"):
-        final = g[g["season_number"] == g["season_number"].max()]
-        final = final.sort_values("episode_number")
-        if len(final) < MIN_SEASON_EP:
-            continue
-        ratings = final["average_rating"].to_numpy(dtype=float)
-        effects.append(ratings[-1] - ratings[:-1].mean())
-    assert round(100 * np.mean(np.array(effects) > 0), 1) == 71.6
+@pytest.fixture(scope="module")
+def contrasts(episodes):
+    return season_contrasts(episodes)
+
+
+# A premium is a rating minus a mean of one-decimal ratings. When the two are
+# equal as rationals, float arithmetic leaves +/-1e-15 rather than 0, so every
+# comparison below goes through a tolerance -- the same one the final-season
+# test needs. The smallest real non-zero premium is 0.1 / (episodes - 1).
+TIE_TOL = 1e-9
+
+
+def test_season_finales_beat_their_own_season(contrasts):
+    """README: season finales win 72.5% of the time.
+
+    Published as 72.6% until the SQL reproduction (sql/analysis/finales.sql)
+    compared the ratings as integers: 91 finales equal their season's mean
+    exactly, and `> 0` had counted the 23 that float arithmetic put at +1e-15 as
+    wins. The last assertion keeps that failure visible."""
+    finale = contrasts["finale"]
+    assert len(finale) == 12_931
+    assert int((finale.abs() <= TIE_TOL).sum()) == 91
+    assert round(100 * (finale > TIE_TOL).mean(), 1) == 72.5
+    assert round(100 * (finale > 0).mean(), 1) == 72.6   # the old, tie-blind count
+
+
+def test_series_finales_usually_rise(contrasts):
+    """README: series finales rise 71.3% of the time (published as 71.6%, for
+    the same reason: 7 of their 23 exact ties were counted as rises)."""
+    series = contrasts.loc[contrasts["is_final_season"], "finale"]
+    assert len(series) == 3_082
+    assert int((series.abs() <= TIE_TOL).sum()) == 23
+    assert round(100 * (series > TIE_TOL).mean(), 1) == 71.3
+    assert round(100 * (series > 0).mean(), 1) == 71.6   # the old, tie-blind count
+
+
+def test_premieres_and_finale_flops_keep_their_published_size(contrasts):
+    """Technical report §4.3: premieres beat their season 43.1% of the time, and
+    9.5% of series finales fall half a point or more. Neither was pinned before,
+    so neither failed when the tie-blind comparison put them at 43.3% and 9.4%."""
+    assert round(100 * (contrasts["premiere"] > TIE_TOL).mean(), 1) == 43.1
+    series = contrasts.loc[contrasts["is_final_season"], "finale"]
+    assert round(100 * (series <= -0.5 + TIE_TOL).mean(), 1) == 9.5
+
+
+def test_the_superseded_finale_shares_are_gone_from_the_documents():
+    """72.6% and 71.6% were stated on every surface that reports the finding.
+
+    Covers the files a reader sees: README, the essay, the technical report in
+    both sources, the outline and the site pages. Does NOT cover
+    docs/technical_report.pdf (binary; it is compiled from the .tex, which is
+    checked here and in test_report_source.py) or the rendered figures (fig03
+    recomputes its labels from the parquet with the same tolerance).
+    docs/decisions.md is excluded on purpose: it records the correction and has
+    to be able to quote the old figures."""
+    from pathlib import Path
+
+    published = ["README.md", "index.md", "_config.yml", "docs/essay.md",
+                 "docs/technical_report.md", "docs/technical_report.tex",
+                 "docs/report_outline.md"]
+    offenders = [
+        f"{name}: {old}"
+        for name in published
+        for old in ("72.6", "71.6")
+        if old in Path(name).read_text(encoding="utf-8")
+    ]
+    assert not offenders, f"superseded finale shares still stated: {offenders}"
 
 
 def test_the_final_season_is_close_to_a_coin_flip(episodes):

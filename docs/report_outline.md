@@ -62,10 +62,10 @@ declines."*
   retroactively validating every analysis that used it.)
 
 ## 3. The finale surprise  [🟢]
-- Season finales are typically a show's *peak*: 72.6% beat their own season
+- Season finales are typically a show's *peak*: 72.5% beat their own season
   (avg +0.25); premieres are unremarkable. (finding #2)
-- Series finales usually rise too (71.6% up); the "finale flop" is the
-  memorable exception (~9% drop hard). (finding #3)
+- Series finales usually rise too (71.3% up); the "finale flop" is the
+  memorable exception (~10% drop hard). (finding #3)
 - Named examples both directions (flops: Dexter, HIMYM, Power; saves: The
   Office, Brooklyn 99, TNG).
 
