@@ -12,13 +12,19 @@ Usage (from the repository root):
 
 import math
 import sqlite3
+from pathlib import Path
 
 import pandas as pd
 
-PARQUET_PATH = "data/processed/episodes.parquet"
+# Paths are anchored to this file rather than the working directory, so the
+# show-lookup app (app/) can open the same database from wherever it is run.
+REPO = Path(__file__).resolve().parent.parent
+PARQUET_PATH = REPO / "data" / "processed" / "episodes.parquet"
+ANALYSIS_DIR = REPO / "sql" / "analysis"
 
-# Files that build a table the queries read. Run first, in this order.
-TABLE_FILES = ["show_slopes.sql"]
+# Files that build a table the queries read. Run first, in this order:
+# show_pages.sql reads the table show_slopes.sql writes.
+TABLE_FILES = ["show_slopes.sql", "show_pages.sql"]
 
 # Files holding exactly one SELECT, whose result is a finding.
 QUERY_FILES = [
@@ -31,13 +37,17 @@ QUERY_FILES = [
 
 
 def read_sql(name):
-    with open(f"sql/analysis/{name}", encoding="utf-8") as f:
-        return f.read()
+    return (ANALYSIS_DIR / name).read_text(encoding="utf-8")
 
 
-def open_analysis_db():
-    """An in-memory SQLite database holding `episodes` and the derived tables."""
-    conn = sqlite3.connect(":memory:")
+def open_analysis_db(shared_across_threads=False):
+    """An in-memory SQLite database holding `episodes` and the derived tables.
+
+    A sqlite3 connection refuses by default to be used from any thread but the
+    one that opened it. The app serves every visitor from one cached connection
+    on Streamlit's worker threads, so it passes shared_across_threads=True and
+    serialises access itself."""
+    conn = sqlite3.connect(":memory:", check_same_thread=not shared_across_threads)
     episodes = pd.read_parquet(PARQUET_PATH)
     # SQLite stores booleans as integers; convert explicitly rather than rely
     # on the driver's choice.

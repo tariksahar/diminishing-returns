@@ -54,10 +54,16 @@ WITH
         GROUP BY show_tconst
     )
 
--- Step 3: the formula itself.
+-- Step 3: the formula itself. The intercept -- where the line starts, at
+-- x = 0 -- follows from the slope: a least-squares line always passes through
+-- the weighted means (Swx / W, Swy / W). The app needs it to draw the line.
 SELECT
     show_tconst,
     n_episodes,
     total_votes,
-    (W * Swxy - Swx * Swy) / (W * Swxx - Swx * Swx) AS slope
-FROM sums;
+    slope,
+    (Swy - slope * Swx) / W AS intercept
+FROM (
+    SELECT sums.*, (W * Swxy - Swx * Swy) / (W * Swxx - Swx * Swx) AS slope
+    FROM sums
+);

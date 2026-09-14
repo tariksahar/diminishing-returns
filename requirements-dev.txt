@@ -9,3 +9,5 @@
 pytest~=9.0
 # Reads the committed technical_report.pdf, so a stale compile fails a test.
 pypdf~=6.14
+# Drives the show-lookup app headless in tests/test_app.py.
+streamlit~=1.63

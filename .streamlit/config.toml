@@ -1,0 +1,22 @@
+# Theme for the show-lookup app (app/streamlit_app.py): the paper and ink of a
+# two-colour riso print. The app's own markup carries the rest of the look.
+
+[theme]
+base = "light"
+primaryColor = "#23212B"
+backgroundColor = "#E9E8E2"
+secondaryBackgroundColor = "#DEDCD3"
+textColor = "#23212B"
+borderColor = "#23212B"
+showWidgetBorder = true
+baseRadius = "none"
+buttonRadius = "none"
+font = "Newsreader:https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap, serif"
+headingFont = "Anybody:https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,100..900&display=swap, sans-serif"
+codeFont = "Azeret Mono:https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;600&display=swap, monospace"
+
+[client]
+toolbarMode = "minimal"
+
+[browser]
+gatherUsageStats = false

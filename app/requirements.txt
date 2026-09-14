@@ -1,0 +1,6 @@
+# What Streamlit Community Cloud installs to run the show-lookup app. Kept
+# apart from the root requirements.txt, which stays the minimum for the
+# analysis itself.
+streamlit~=1.63
+pandas~=3.0
+pyarrow~=25.0
