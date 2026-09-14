@@ -11,3 +11,7 @@ _site/
 .jekyll-cache/
 .jekyll-metadata
 Gemfile.lock
+
+# Local SQLite copy of the raw IMDb dumps, rebuilt by sql/load_raw.py. Derived
+# from data/raw/ (itself ignored), so it is never committed either.
+data/imdb.sqlite
