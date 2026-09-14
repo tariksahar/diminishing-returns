@@ -450,3 +450,8 @@ a fact about endings, not about series.
 
 We are, all of us, far better at remembering how a story left us than how it
 treated us along the way.
+
+---
+
+*Still thinking of a different show? [Look it up](https://diminishing-returns.streamlit.app): all 3,234 are
+there. Make your guess before you scroll.*

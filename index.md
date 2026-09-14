@@ -29,6 +29,11 @@ show's <em>peak</em>.</p>
     show that everyone remembers wrongly. Start here.</p>
   </li>
   <li>
+    <a href="https://diminishing-returns.streamlit.app">Did It Decline?</a>
+    <p>The findings, one show at a time. Pick any of the 3,234 shows, guess
+    whether it declined, then see what its ratings actually did.</p>
+  </li>
+  <li>
     <a href="docs/technical_report.html">The technical report</a>
     <p>The same findings in formal form: data, methods, results with confidence
     intervals, robustness checks, limitations and the full regression table.

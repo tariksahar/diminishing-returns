@@ -2,6 +2,7 @@
 
 [![tests](https://github.com/tariksahar/diminishing-returns/actions/workflows/tests.yml/badge.svg)](https://github.com/tariksahar/diminishing-returns/actions/workflows/tests.yml)
 [![read the essay](https://img.shields.io/badge/read-the%20essay-2a78d6)](https://tariksahar.github.io/diminishing-returns/docs/essay.html)
+[![look up a show](https://img.shields.io/badge/look%20up-your%20show-23212B)](https://diminishing-returns.streamlit.app)
 
 Everyone knows television declines: shows arrive full of promise, spend their
 best ideas early, and coast downhill to a finish nobody asked for.
@@ -27,7 +28,7 @@ expects a collapse — the finale — is usually a show's *peak*.
 | "The final season is cursed" | Almost a coin flip: **50.5%** down, **49.2%** up. Only **12.6%** lose half a point or more. |
 | "It depends on the genre" | Genre barely matters. **Age and length** do: every extra season costs **0.026** of a rating point, every decade newer adds **0.048**. |
 | "The first season is always best" | The **last** season is the single best more often (**37%**) than the first (**27%**). |
-| "But *my* shows declined" | Fair. Clear decline climbs with audience size, from **15%** among obscure shows to **43%** among the 60 household names. The belief fits the shows it's drawn from. |
+| "But *my* shows declined" | Fair. Clear decline climbs with audience size, from **15%** among obscure shows to **43%** among the 60 household names. The belief fits the shows it's drawn from. [Check yours](https://diminishing-returns.streamlit.app). |
 
 Decline is real — it just lives somewhere other than where the belief puts it:
 in shows that ran too long, in shows that are simply old, and in the handful of
@@ -42,6 +43,9 @@ which is the better place for the essay.
 - **[The essay](docs/essay.md)** — *Your Favourite Show Probably Didn't
   Decline*: the full argument in plain language, with all nine figures. Start
   here.
+- **[Did It Decline?](https://diminishing-returns.streamlit.app)** — the findings, one show at a time. Pick any of
+  the 3,234 shows, guess whether it declined, then see its verdict, every
+  episode's rating, its final season and its finales.
 - **[The technical report](docs/technical_report.pdf)** (PDF, 16 pages) — the
   same findings in formal form: abstract, data, methods, results with
   confidence intervals, robustness checks, limitations, references and the full
@@ -140,6 +144,11 @@ python sql/load_raw.py       # optional: raw dumps -> data/imdb.sqlite (about a 
 python sql/run_build.py      # optional: the build in SQL, with its filter funnel
 ```
 
+The [show-lookup app](https://diminishing-returns.streamlit.app) is built on this layer. It prints nothing it
+computes itself: every number on a show's page is one row of
+[`show_pages.sql`](sql/analysis/show_pages.sql), and a test checks that the
+3,234 rows add back up to the published findings.
+
 ## Reproducing it
 
 Built with Python 3.14 on Windows. The raw IMDb dumps are not committed
@@ -161,6 +170,9 @@ pip install -r requirements.txt
    rest are checks and counter-tests that print their findings.
 4. **Draw the figures.** `python notebooks/phase3_figures.py` regenerates all
    nine figures into `figures/`.
+5. **Run the app.** `pip install -r app/requirements.txt`, then
+   `streamlit run app/streamlit_app.py`. It reads the committed data, so it
+   needs none of the steps above.
 
 Every script is run from the repository root.
 
@@ -193,6 +205,7 @@ docs/             the essay, the technical report, the decision log, the outline
 figures/          the nine report figures (fig01 … fig09), in three renderings
 notebooks/        one script per question, named by phase
 sql/              the build and the findings again, in SQLite
+app/              the show-lookup app (Streamlit), live at diminishing-returns.streamlit.app
 src/build.py      raw IMDb tables -> the analysis dataset
 tests/            recomputes every published number from data/processed/
 index.md          landing page for the GitHub Pages site (_config.yml, _layouts/)
