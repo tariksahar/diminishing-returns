@@ -75,6 +75,38 @@ class ShowLookup:
             (show_tconst,),
         )
 
+    def deal(self, n=6, exclude=()):
+        """A random hand of n household names -- shows with 500,000 votes or
+        more -- leaving out the ids in `exclude`, so a new hand never repeats
+        the one on the table.
+
+        ORDER BY RANDOM() shuffles the matching rows and LIMIT keeps the first
+        n. The NOT IN list needs one ? per excluded id; only those placeholder
+        marks are built into the SQL text, and the ids themselves are still
+        bound as parameters."""
+        not_in = f"AND show_tconst NOT IN ({', '.join('?' for _ in exclude)})" if exclude else ""
+        return self._rows(
+            f"""
+            SELECT show_tconst, title, start_year, verdict
+            FROM show_pages
+            WHERE audience_tier = 4 {not_in}
+            ORDER BY RANDOM()
+            LIMIT ?
+            """,
+            (*exclude, n),
+        )
+
+    def household_names(self):
+        """How many household names there are, and how many clearly declined."""
+        return self._rows(
+            """
+            SELECT COUNT(*)                 AS n_shows,
+                   SUM(verdict = 'decline') AS n_declined
+            FROM show_pages
+            WHERE audience_tier = 4
+            """
+        )[0]
+
     def context(self, audience_tier):
         """The numbers a show is placed against: how many shows there are, how
         many are flat, and how common clear decline is in its audience tier."""

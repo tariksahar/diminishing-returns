@@ -243,7 +243,9 @@ def test_markup_names_no_colour_directly(every_show):
     page, episodes, context = every_show[0]
     markup = (riso.masthead(page, True) + riso.chart(page, episodes)
               + riso.verdict(page, episodes, context, guess=None) + riso.context_block(page, context)
-              + riso.footer() + riso.empty_state(3_234))
+              + riso.footer()
+              + riso.game_intro([{"show_tconst": "tt1", "verdict": "decline"}], {"tt1": "flat"}, {},
+                                {"n_shows": 60, "n_declined": 26}))
     assert not re.search(r"#[0-9A-Fa-f]{6}\b", markup)
     assert not re.search(r'\b(fill|stroke)="#', markup)
 
@@ -257,13 +259,71 @@ def test_the_theme_config_carries_the_same_two_palettes():
         assert config["theme"][section]["textColor"] == palette["ink"]
 
 
-def test_clearing_the_search_shows_an_empty_page_and_picking_brings_it_back():
+def cards(app):
+    return [b for b in app.button if b.key and b.key.startswith("card-")]
+
+
+def card_id(button):
+    return button.key.split("-")[1]
+
+
+def test_a_hand_is_six_distinct_household_names_and_a_new_one_never_repeats_it(lookup):
+    hand = lookup.deal()
+    ids = [c["show_tconst"] for c in hand]
+    assert len(set(ids)) == 6
+    assert all(lookup.page(i)["audience_tier"] == 4 for i in ids)
+    again = lookup.deal(exclude=ids)
+    assert len(again) == 6 and not set(ids) & {c["show_tconst"] for c in again}
+    assert lookup.household_names() == {"n_shows": 60, "n_declined": 26}
+
+
+def test_game_cards_never_carry_a_verdict(lookup):
+    for card in lookup.deal(n=60):
+        label = riso.card_label(card, guess=None, skipped=False)
+        for word in list(riso.VERDICT_LABEL.values()) + ["declin", "flat", "rise"]:
+            assert word.lower() not in label.lower().replace(card["title"].lower(), ""), card["title"]
+
+
+def test_the_score_only_tallies_the_hand_once_every_card_is_played():
+    hand = [{"show_tconst": f"tt{i}", "verdict": v} for i, v in enumerate(["decline", "flat", "rise"])]
+    household = {"n_shows": 60, "n_declined": 26}
+    partial = riso.game_intro(hand, {"tt0": "decline"}, {}, household)
+    assert "called 1 of 1" in partial and "Of these six" not in partial
+    done = riso.game_intro(hand, {"tt0": "decline", "tt1": "rise"}, {"tt2": True}, household)
+    assert "You called 1 of 2" in done and "1 clearly declined" in done and "26 did" in done
+
+
+def test_clearing_the_search_deals_a_hand_to_play():
     app = start()
     app.selectbox[0].set_value(None).run()
     assert not app.exception
-    content = "".join(b.value for b in app.markdown if not b.value.lstrip().startswith("<style>"))
-    assert "riso-empty" in content
     assert "show" not in app.query_params
-    app.selectbox[0].set_value(BREAKING_BAD).run()
-    assert app.query_params["show"] == [BREAKING_BAD]
+    assert len(cards(app)) == 6
+    content = "".join(b.value for b in app.markdown if not b.value.lstrip().startswith("<style>"))
+    assert "How many of them declined?" in content
+
+
+def test_a_card_opens_its_show_unrevealed_and_is_marked_once_played():
+    app = start()
+    app.selectbox[0].set_value(None).run()
+    first = cards(app)[0]
+    chosen = card_id(first)
+    first.click().run()
+    assert app.selectbox[0].value == chosen
+    assert app.query_params["show"] == [chosen]
     assert not revealed(app)
+
+    app.segmented_control[0].set_value("decline").run()
+    app.selectbox[0].set_value(None).run()
+    played = [b for b in cards(app) if card_id(b) == chosen]
+    assert played and played[0].key.endswith("-played")
+    assert len(cards(app)) == 6, "the hand must survive a visit to one of its shows"
+
+
+def test_dealing_again_brings_six_new_shows():
+    app = start()
+    app.selectbox[0].set_value(None).run()
+    before = {card_id(b) for b in cards(app)}
+    next(b for b in app.button if b.label == "Deal six more").click().run()
+    after = {card_id(b) for b in cards(app)}
+    assert len(after) == 6 and before.isdisjoint(after)

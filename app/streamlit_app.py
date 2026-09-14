@@ -25,6 +25,7 @@ def show_html(markup):
     # -- is escaped in riso.py before it gets here.
     st.markdown(markup, unsafe_allow_html=True)
 
+
 DEFAULT_SHOW = "tt0944947"  # Game of Thrones
 
 st.set_page_config(page_title="Did It Decline?", page_icon="📺", layout="centered")
@@ -69,9 +70,40 @@ show = st.selectbox(
 )
 
 if show is None:
-    # Cleared with the x: an empty search, waiting for a title.
+    # Cleared with the x. Rather than an empty page, a hand of six household
+    # names to call. The hand is dealt once and kept in session state: dealt
+    # inline, every click anywhere would rerun the script and reshuffle it.
     st.query_params.pop("show", None)
-    show_html(riso.empty_state(len(ids)))
+    if "hand" not in st.session_state:
+        st.session_state["hand"] = lookup.deal()
+    hand = st.session_state["hand"]
+
+    def open_show(show_id):
+        # Runs before the next rerun, which is the only moment a widget's own
+        # key (the selectbox's "show") may still be written.
+        st.session_state["show"] = show_id
+
+    def deal_more():
+        st.session_state["hand"] = lookup.deal(exclude=[card["show_tconst"] for card in hand])
+
+    guesses = {c["show_tconst"]: st.session_state.get(f"guess-{c['show_tconst']}") for c in hand}
+    skips = {c["show_tconst"]: st.session_state.get(f"skip-{c['show_tconst']}", False) for c in hand}
+    show_html(riso.game_intro(hand, guesses, skips, lookup.household_names()))
+
+    columns = st.columns(3)
+    for i, card in enumerate(hand):
+        show_id = card["show_tconst"]
+        played = guesses[show_id] is not None or skips[show_id]
+        with columns[i % 3]:
+            st.button(
+                riso.card_label(card, guesses[show_id], skips[show_id]),
+                key=f"card-{show_id}-{'played' if played else 'open'}",
+                on_click=open_show,
+                args=(show_id,),
+                width="stretch",
+            )
+    st.button("Deal six more", type="tertiary", on_click=deal_more)
+
     show_html(riso.footer())
     st.stop()
 

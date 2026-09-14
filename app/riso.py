@@ -168,8 +168,32 @@ def stylesheet():
 .riso-chart svg {{ display: block; width: 100%; height: auto; }}
 .riso-chart svg.narrow {{ display: none; }}
 .riso-caption {{ margin: 6px 0 0; }}
-.riso-empty {{ border-top: 2px solid var(--ink); padding-top: 12px; margin-bottom: 48px; }}
-[data-testid="stMarkdownContainer"] .riso-empty p.riso-mono {{ font-size: 11.5px; margin: 0; }}
+.riso-game {{ border-top: 2px solid var(--ink); padding-top: 12px; margin-bottom: 8px; }}
+[data-testid="stMarkdownContainer"] .riso-game p.riso-mono {{ font-size: 11.5px; margin: 0; }}
+.riso-game-title {{ font-family: "Anybody", Impact, sans-serif; font-weight: 900; font-stretch: 130%; text-transform: uppercase;
+  font-size: clamp(26px, 4.4vw, 46px); line-height: .95; margin: 14px 0 0; max-width: 20ch; text-wrap: balance; }}
+
+/* The game's cards are Streamlit buttons, reached through the st-key-<key>
+   class Streamlit puts on a keyed widget's container. */
+[class*="st-key-card-"] button {{
+  width: 100%; min-height: 104px; justify-content: flex-start; align-items: flex-start; text-align: left;
+  border: 2px solid var(--ink) !important; border-radius: 0 !important; background: var(--paper) !important;
+  padding: 14px 16px !important; transition: box-shadow .12s ease, transform .12s ease;
+}}
+[class*="st-key-card-"] button:hover,
+[class*="st-key-card-"] button:focus-visible {{ box-shadow: 5px 4px 0 var(--yellow); transform: translate(-1px, -1px); }}
+[class*="st-key-card-"] button p {{ font-family: "Anybody", Impact, sans-serif; font-weight: 800; font-stretch: 115%;
+  text-transform: uppercase; font-size: 16px; line-height: 1.15; text-align: left; color: var(--ink); }}
+/* Streamlit keeps a button label on one line and cuts it with an ellipsis;
+   a card has room to wrap "Star Wars: The Clone Wars" instead. */
+[class*="st-key-card-"] button p, [class*="st-key-card-"] button div {{ white-space: normal !important; overflow: visible !important; text-overflow: clip !important;
+  justify-content: flex-start !important; text-align: left !important; width: 100%; }}
+.riso-game-status {{ margin: 12px 0 18px; }}
+[class*="st-key-card-"][class*="-played"] button {{ border-style: dashed !important; }}
+@media (prefers-reduced-motion: reduce) {{
+  [class*="st-key-card-"] button {{ transition: none; }}
+  [class*="st-key-card-"] button:hover {{ transform: none; }}
+}}
 [data-testid="stMarkdownContainer"] p.riso-waiting {{ font-size: 11.5px; margin: 2px 0 40px; }}
 
 .riso-context {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 32px; border-top: 2px solid var(--ink); padding-top: 16px; }}
@@ -186,6 +210,7 @@ def stylesheet():
   .riso-chart svg.wide {{ display: none; }}
   .riso-chart svg.narrow {{ display: block; }}
   .riso-facts {{ grid-template-columns: 1fr; gap: 2px; }}
+  [class*="st-key-card-"] button {{ min-height: 62px; }}
   .riso-facts dd {{ margin-bottom: 10px; }}
 }}
 </style>"""
@@ -378,9 +403,52 @@ def footer():
 </div>"""
 
 
-def empty_state(n_shows):
-    """What the page shows when the search has been cleared."""
-    return f"""<div class="riso riso-empty">
-  <p class="riso-mono">Episode guide · blank</p>
-  <p class="riso-lede">Type a title above. All {n_shows:,} shows are in here, from the ones everyone remembers to the ones nobody does.</p>
+MARKDOWN_SPECIALS = r"\`*_{}[]()#+-.!|<>"
+
+
+def markdown_text(text):
+    """Escape a title for a Streamlit button label, which renders markdown: a
+    show called *Anything* must not come out in italics."""
+    return "".join("\\" + ch if ch in MARKDOWN_SPECIALS else ch for ch in text)
+
+
+def card_label(card, guess, skipped):
+    """A game card: the show, its first year, and once played, how it went.
+    The verdict itself never appears on a card."""
+    title = markdown_text(f"{card['title']} ({card['start_year']})")
+    if guess is not None:
+        mark = "✓ called it" if guess == card["verdict"] else "✗ missed"
+    elif skipped:
+        mark = "· seen"
+    else:
+        return title
+    # Two trailing spaces and a newline: a markdown line break.
+    return f"{title}  \n{mark}"
+
+
+def game_intro(hand, guesses, skips, household):
+    """The blank page's heading: a hand of six household names to call.
+
+    `guesses` and `skips` map show ids to what the visitor did with them. The
+    score counts guesses only; the hand's own tally is printed once every card
+    has been played, so it cannot give an unplayed card away."""
+    called = [c for c in hand if guesses.get(c["show_tconst"]) is not None]
+    right = sum(guesses[c["show_tconst"]] == c["verdict"] for c in called)
+    played = all(guesses.get(c["show_tconst"]) is not None or skips.get(c["show_tconst"]) for c in hand)
+    if played:
+        declined = sum(c["verdict"] == "decline" for c in hand)
+        status = (
+            f"Of these six, {declined} clearly declined. Across all {household['n_shows']} shows with "
+            f"500,000 votes or more, {household['n_declined']} did."
+        )
+        if called:
+            status = f"You called {right} of {len(called)}. " + status
+    elif called:
+        status = f"You've called {right} of {len(called)} so far."
+    else:
+        status = "Pick one and make your call. The page only answers after you do."
+    return f"""<div class="riso riso-game">
+  <p class="riso-mono">Episode guide · a quick game</p>
+  <div class="riso-game-title" role="heading" aria-level="2">Six household names. How many of them declined?</div>
+  <div class="riso-lede riso-game-status">{escape(status)}</div>
 </div>"""
