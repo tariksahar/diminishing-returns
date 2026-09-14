@@ -4,7 +4,9 @@ Pure functions from data to markup, with no Streamlit import, so the page's
 wording and numbers can be tested directly. The palette keeps the project's
 one rule about colour: red means decline and blue means rise, here as the two
 physical inks of a riso print. A third ink, yellow, carries no meaning and is
-used only before the verdict is revealed, so the page cannot hint at it.
+used only before the verdict is revealed, so the page cannot hint at it. Before
+the reveal the page holds no chart at all: bars give a collapse away as surely
+as a colour does.
 """
 
 from html import escape
@@ -131,6 +133,7 @@ def stylesheet():
 .riso-chart svg {{ display: block; width: 100%; height: auto; }}
 .riso-chart svg.narrow {{ display: none; }}
 .riso-caption {{ margin: 6px 0 0; }}
+[data-testid="stMarkdownContainer"] p.riso-waiting {{ font-size: 11.5px; margin: 2px 0 40px; }}
 
 .riso-context {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 32px; border-top: 2px solid {INK}; padding-top: 16px; }}
 .riso-context p {{ margin: 6px 0 0; font-size: 17px; line-height: 1.45; max-width: 44ch; }}
@@ -171,7 +174,7 @@ WIDE = {"W": 960, "H": 300, "L": 44, "R": 16, "T": 22, "B": 34, "font": 12, "lab
 NARROW = {"W": 520, "H": 340, "L": 34, "R": 8, "T": 18, "B": 36, "font": 15, "label_gap": 62, "line": 5, "halo": 10}
 
 
-def _chart_svg(page, episodes, revealed, frame, css_class):
+def _chart_svg(page, episodes, frame, css_class):
     W, H, L, R, T, B = (frame[k] for k in ("W", "H", "L", "R", "T", "B"))
     font = frame["font"]
     n = len(episodes)
@@ -189,7 +192,7 @@ def _chart_svg(page, episodes, revealed, frame, css_class):
     text = f'font-family="Azeret Mono, monospace" font-size="{font}" fill="{INK}"'
     parts = []
     first_final = next(i for i, e in enumerate(episodes) if e["season_number"] == last_season)
-    if revealed and not page["ongoing"]:
+    if not page["ongoing"]:
         bx = (x(first_final - 1) + x(first_final)) / 2
         parts.append(f'<rect x="{bx:.1f}" y="{T}" width="{W - R - bx:.1f}" height="{H - T - B}" fill="{accent}" opacity=".13"/>')
 
@@ -222,38 +225,37 @@ def _chart_svg(page, episodes, revealed, frame, css_class):
 
     bar = max(0.6, (W - L - R) / n * 0.62)
     for i, e in enumerate(episodes):
-        fill = accent if revealed and not page["ongoing"] and e["season_number"] == last_season and page["verdict"] != "flat" else INK
+        fill = accent if not page["ongoing"] and e["season_number"] == last_season and page["verdict"] != "flat" else INK
         top = y(e["average_rating"])
         parts.append(f'<rect x="{x(i) - bar / 2:.2f}" y="{top:.1f}" width="{bar:.2f}" height="{y(lo) - top:.1f}" fill="{fill}" style="mix-blend-mode:multiply"/>')
 
-    if revealed:
-        y0, y1 = page["intercept"], page["intercept"] + page["slope"]
-        dash = ' stroke-dasharray="14 8"' if page["verdict"] == "flat" else ""
-        line_ink = accent if page["verdict"] != "flat" else INK
-        ends = f'x1="{x(0):.1f}" y1="{y(y0):.1f}" x2="{x(n - 1):.1f}" y2="{y(y1):.1f}"'
-        # A band of bare paper under the line first. Without it the ink line,
-        # overprinted on ink bars, disappears into them wherever it crosses.
-        parts.append(f'<line {ends} stroke="{PAPER}" stroke-width="{frame["halo"]}" stroke-linecap="round"/>')
-        parts.append(f'<line {ends} stroke="{line_ink}" stroke-width="{frame["line"]}" stroke-linecap="round"{dash} style="mix-blend-mode:multiply"/>')
+    y0, y1 = page["intercept"], page["intercept"] + page["slope"]
+    dash = ' stroke-dasharray="14 8"' if page["verdict"] == "flat" else ""
+    line_ink = accent if page["verdict"] != "flat" else INK
+    ends = f'x1="{x(0):.1f}" y1="{y(y0):.1f}" x2="{x(n - 1):.1f}" y2="{y(y1):.1f}"'
+    # A band of bare paper under the line first. Without it the ink line,
+    # overprinted on ink bars, disappears into them wherever it crosses.
+    parts.append(f'<line {ends} stroke="{PAPER}" stroke-width="{frame["halo"]}" stroke-linecap="round"/>')
+    parts.append(f'<line {ends} stroke="{line_ink}" stroke-width="{frame["line"]}" stroke-linecap="round"{dash} style="mix-blend-mode:multiply"/>')
 
     label = escape(page["title"])
     return (f'<svg class="{css_class}" viewBox="0 0 {W} {H}" role="img" '
             f'aria-label="{label}: IMDb rating of each episode in broadcast order">{"".join(parts)}</svg>')
 
 
-def chart(page, episodes, revealed):
-    """Every episode as a bar of ink, in broadcast order. The reveal adds the
-    weighted trend line and prints the final season in the verdict's ink."""
-    caption = (
-        "Every rated episode, in order. The line is the vote-weighted trend."
-        if revealed else
-        "Every rated episode, in order. Make your call to see the trend."
-    )
+def chart(page, episodes):
+    """Every episode as a bar of ink, in broadcast order, with the weighted
+    trend line and the final season printed in the verdict's ink. Drawn only
+    once the verdict is revealed."""
     return f"""<figure class="riso riso-chart" style="margin:0">
-  {_chart_svg(page, episodes, revealed, WIDE, "wide")}
-  {_chart_svg(page, episodes, revealed, NARROW, "narrow")}
-  <figcaption class="riso-caption riso-mono">{caption}</figcaption>
+  {_chart_svg(page, episodes, WIDE, "wide")}
+  {_chart_svg(page, episodes, NARROW, "narrow")}
+  <figcaption class="riso-caption riso-mono">Every rated episode, in order. The line is the vote-weighted trend.</figcaption>
 </figure>"""
+
+
+def waiting_note():
+    return """<p class="riso riso-mono riso-waiting">The chart and the verdict appear once you answer.</p>"""
 
 
 def final_season_sentence(page):

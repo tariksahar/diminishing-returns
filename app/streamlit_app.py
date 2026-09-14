@@ -89,6 +89,9 @@ revealed = guess is not None or st.session_state.get(skip_key, False)
 
 show_html(riso.masthead(page, revealed))
 
+# Before the reveal the page shows the question and nothing that answers it.
+# That includes the chart: bars alone give a collapse away at a glance, so it
+# appears only with the verdict.
 if not revealed:
     st.segmented_control(
         "Before you look: did it get worse?",
@@ -97,13 +100,13 @@ if not revealed:
         key=widget_key,
         on_change=keep_guess,
     )
-    show_html(riso.chart(page, episodes, revealed=False))
     if st.button("Skip the guess", type="tertiary"):
         st.session_state[skip_key] = True
         st.rerun()
+    show_html(riso.waiting_note())
 else:
     show_html(riso.verdict(page, episodes, context, guess))
-    show_html(riso.chart(page, episodes, revealed=True))
+    show_html(riso.chart(page, episodes))
     show_html(riso.context_block(page, context))
 
 show_html(riso.footer())
