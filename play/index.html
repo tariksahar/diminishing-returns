@@ -1,0 +1,46 @@
+---
+layout: null
+title: Did It Decline?
+description: >-
+  Six household names. How many of them declined? Make your call, then see
+  what 3,234 shows' IMDb ratings actually did.
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!--
+    The link to share for the show-lookup app: /diminishing-returns/play/.
+
+    The app lives on Streamlit Community Cloud, which serves its own page head,
+    and that head carries no og:title, og:description or og:image. Shared
+    directly, the app's address unfurls as a bare link. This page carries the
+    site's card (jekyll-seo-tag, from the front matter above and the site-wide
+    image default) and then sends the visitor on.
+
+    The redirect is JavaScript on purpose. Link-preview crawlers read this head
+    without running scripts, so they stay here and show the card. A meta
+    refresh would be read as a redirect to follow, and the preview would come
+    from the app's empty head instead. Without JavaScript the page still works:
+    the link in the body is the whole of it.
+  -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  {% seo %}
+  <script>window.location.replace("https://diminishing-returns.streamlit.app");</script>
+  <style>
+    :root { --paper: #E9E8E2; --ink: #23212B; }
+    @media (prefers-color-scheme: dark) { :root { --paper: #18171C; --ink: #ECE7DA; } }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+           background: var(--paper); color: var(--ink); font: 17px/1.5 Georgia, serif; }
+    a { color: inherit; font: 600 14px/1 ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase;
+        border: 2px solid var(--ink); padding: 12px 18px; text-decoration: none; display: inline-block; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <main>
+    <p>Opening <em>Did It Decline?</em> — six household names, and your call on each.</p>
+    <a href="https://diminishing-returns.streamlit.app">Open the game</a>
+  </main>
+</body>
+</html>

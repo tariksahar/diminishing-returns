@@ -52,7 +52,10 @@ defaults:
 exclude:
   - .claude/
   - .github/
+  - .streamlit/
   - .venv/
+  - app/
+  - sql/
   - .pytest_cache/
   - data/
   - notebooks/

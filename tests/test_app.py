@@ -372,3 +372,20 @@ def test_a_show_reached_by_search_offers_the_game():
     back[0].click().run()
     assert app.selectbox[0].value is None
     assert len(cards(app)) == 6
+
+
+def test_the_share_link_carries_a_preview_and_hands_visitors_to_the_app():
+    """play/index.html is the address to share: Streamlit Cloud's own page head
+    has no og tags, so a direct app link unfurls bare. The page must carry the
+    site's seo tag and redirect by script only -- a meta refresh would send
+    link-preview crawlers on to the app's empty head."""
+    page = (APP_DIR.parent / "play" / "index.html").read_text(encoding="utf-8")
+    front_matter, body = page.split("---\n", 2)[1:]
+    assert "layout: null" in front_matter
+    assert "title: Did It Decline?" in front_matter
+    assert "description:" in front_matter
+    assert body.lstrip().startswith("<!DOCTYPE html>"), "anything before the doctype drops the page into quirks mode"
+    assert "{% seo %}" in body
+    assert 'window.location.replace("https://diminishing-returns.streamlit.app")' in body
+    assert 'href="https://diminishing-returns.streamlit.app"' in body, "the page must work without JavaScript"
+    assert "http-equiv" not in body.lower()
