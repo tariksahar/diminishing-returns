@@ -337,3 +337,38 @@ def test_dealing_again_brings_six_new_shows():
     next(b for b in app.button if b.label == "Deal six more").click().run()
     after = {card_id(b) for b in cards(app)}
     assert len(after) == 6 and before.isdisjoint(after)
+
+
+def back_button(app):
+    return [b for b in app.button if b.key == "back-to-game"]
+
+
+def test_a_revealed_show_offers_the_way_back_to_the_same_hand():
+    """The route home used to be the search box's x alone, which nothing points
+    to. The way back appears with the verdict, not before it, and returns to the
+    hand as it was left."""
+    app = start()
+    hand = {card_id(b) for b in cards(app)}
+    first = cards(app)[0]
+    chosen = card_id(first)
+    first.click().run()
+    assert not back_button(app), "no way back before the verdict: the guess comes first"
+
+    app.segmented_control[0].set_value("rise").run()
+    back = back_button(app)
+    assert back and back[0].label == "← Back to the six"
+    back[0].click().run()
+
+    assert app.selectbox[0].value is None
+    assert {card_id(b) for b in cards(app)} == hand
+    assert any(card_id(b) == chosen and b.key.endswith("-played") for b in cards(app))
+
+
+def test_a_show_reached_by_search_offers_the_game():
+    app = start(GOT)
+    next(b for b in app.button if b.label == "Skip the guess").click().run()
+    back = back_button(app)
+    assert back and back[0].label == "← Play the game"
+    back[0].click().run()
+    assert app.selectbox[0].value is None
+    assert len(cards(app)) == 6

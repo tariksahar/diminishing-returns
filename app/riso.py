@@ -190,7 +190,17 @@ def stylesheet():
   justify-content: flex-start !important; text-align: left !important; width: 100%; }}
 .riso-game-status {{ margin: 12px 0 18px; }}
 [class*="st-key-card-"][class*="-played"] button {{ border-style: dashed !important; }}
+
+/* The way back to the game: a plain ink-framed button, set in the mono face
+   like the page's other signposts. */
+.st-key-back-to-game {{ margin-top: 10px; }}
+.st-key-back-to-game button {{ border: 2px solid var(--ink) !important; border-radius: 0 !important; background: var(--paper) !important;
+  padding: 10px 18px !important; transition: box-shadow .12s ease; }}
+.st-key-back-to-game button:hover, .st-key-back-to-game button:focus-visible {{ box-shadow: 5px 4px 0 var(--yellow); }}
+.st-key-back-to-game button p {{ font-family: "Azeret Mono", ui-monospace, monospace; font-size: 13px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--ink); }}
 @media (prefers-reduced-motion: reduce) {{
+  .st-key-back-to-game button {{ transition: none; }}
   [class*="st-key-card-"] button {{ transition: none; }}
   [class*="st-key-card-"] button:hover {{ transform: none; }}
 }}
@@ -211,6 +221,9 @@ def stylesheet():
   .riso-chart svg.narrow {{ display: block; }}
   .riso-facts {{ grid-template-columns: 1fr; gap: 2px; }}
   [class*="st-key-card-"] button {{ min-height: 62px; }}
+  /* The game's question wrapped into four ragged lines at its desktop measure;
+     on a phone it takes the full width at a smaller size. */
+  .riso-game-title {{ font-size: 24px; max-width: none; }}
   .riso-facts dd {{ margin-bottom: 10px; }}
 }}
 </style>"""

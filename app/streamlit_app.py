@@ -155,4 +155,16 @@ else:
     show_html(riso.chart(page, episodes))
     show_html(riso.context_block(page, context))
 
+    # The way back. Without it the only route home was the search box's x,
+    # which nothing points to, so a visitor who opened one card stayed there.
+    def back_to_game():
+        st.session_state["show"] = None
+
+    in_hand = any(card["show_tconst"] == show for card in st.session_state.get("hand", []))
+    st.button(
+        "← Back to the six" if in_hand else "← Play the game",
+        key="back-to-game",
+        on_click=back_to_game,
+    )
+
 show_html(riso.footer())
