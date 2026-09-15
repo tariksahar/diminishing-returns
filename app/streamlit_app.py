@@ -26,8 +26,6 @@ def show_html(markup):
     st.markdown(markup, unsafe_allow_html=True)
 
 
-DEFAULT_SHOW = "tt0944947"  # Game of Thrones
-
 st.set_page_config(page_title="Did It Decline?", page_icon="📺", layout="centered")
 
 
@@ -53,13 +51,17 @@ ids = list(labels)
 # and is not: Streamlit identifies a widget partly by its arguments, so an index
 # that changes after each pick makes it a "new" widget, which resets to that
 # index and silently throws away the visitor's second choice.
+#
+# A visitor without a show in the URL (or with one that does not exist) starts
+# on the game below, not on a show: a single famous page answers its own
+# question, while six names to call puts the essay's point in front of them.
 if "show" not in st.session_state:
-    requested = st.query_params.get("show", DEFAULT_SHOW)
-    st.session_state["show"] = requested if requested in labels else DEFAULT_SHOW
+    requested = st.query_params.get("show")
+    st.session_state["show"] = requested if requested in labels else None
 
 # index=None is what gives the box its clear (x) button: Streamlit only offers
-# one on a selectbox that is allowed to be empty. The value still starts on a
-# show, from the session state seeded above.
+# one on a selectbox that is allowed to be empty. Its value comes from the
+# session state seeded above.
 show = st.selectbox(
     "Pick a show",
     ids,
@@ -70,8 +72,8 @@ show = st.selectbox(
 )
 
 if show is None:
-    # Cleared with the x. Rather than an empty page, a hand of six household
-    # names to call. The hand is dealt once and kept in session state: dealt
+    # The home page: on arrival, or after the x. A hand of six household names
+    # to call. The hand is dealt once and kept in session state: dealt
     # inline, every click anywhere would rerun the script and reshuffle it.
     st.query_params.pop("show", None)
     if "hand" not in st.session_state:

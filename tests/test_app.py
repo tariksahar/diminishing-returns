@@ -143,8 +143,17 @@ def revealed(app):
     return 'class="riso-stamp"' in "".join(block.value for block in app.markdown)
 
 
-def test_opens_on_game_of_thrones_with_the_verdict_hidden():
+def test_opens_on_the_game():
     app = start()
+    assert not app.exception
+    assert app.selectbox[0].value is None
+    assert "show" not in app.query_params
+    assert len(cards(app)) == 6
+    assert not revealed(app)
+
+
+def test_a_show_opens_with_the_verdict_hidden():
+    app = start(GOT)
     assert not app.exception
     assert app.selectbox[0].value == GOT
     assert not revealed(app)
@@ -160,7 +169,7 @@ def test_before_the_guess_the_page_holds_no_chart():
         # SVG texture, and neither puts a chart on the page.
         return "".join(b.value for b in app.markdown if not b.value.lstrip().startswith("<style>"))
 
-    app = start()
+    app = start(GOT)
     before = content(app)
     assert "<svg" not in before
     assert "riso-chart" not in before
@@ -169,7 +178,7 @@ def test_before_the_guess_the_page_holds_no_chart():
 
 
 def test_skip_sits_directly_under_the_question():
-    app = start()
+    app = start(GOT)
     kinds = [type(element).__name__ for element in app.main.children.values()]
     question = kinds.index("ButtonGroup")
     assert kinds[question + 1] == "Button"
@@ -181,7 +190,7 @@ def test_a_guess_reveals_the_verdict_and_stays_revealed():
     value once it is not drawn. Keeping the guess only in the widget's own key
     reveals the verdict and then closes it again on the very next rerun --
     checked, not assumed."""
-    app = start()
+    app = start(GOT)
     app.segmented_control[0].set_value("decline").run()
     assert revealed(app)
     app.run()
@@ -193,7 +202,7 @@ def test_every_pick_sticks_and_guesses_are_kept_per_show():
     """The first running version passed the URL's show as the selectbox index
     on every run; the changing index made Streamlit treat the box as a new
     widget and discard the visitor's second pick. This test is what caught it."""
-    app = start()
+    app = start(GOT)
     app.segmented_control[0].set_value("decline").run()
     for show in [BREAKING_BAD, GOT, FRIENDS, BREAKING_BAD]:
         app.selectbox[0].set_value(show).run()
@@ -202,11 +211,12 @@ def test_every_pick_sticks_and_guesses_are_kept_per_show():
         assert revealed(app) == (show == GOT)
 
 
-def test_a_shared_link_opens_its_show_and_a_bad_one_falls_back():
+def test_a_shared_link_opens_its_show_and_a_bad_one_falls_back_to_the_game():
     assert start(FRIENDS).selectbox[0].value == FRIENDS
     bad = start("x' OR 1=1 --")
     assert not bad.exception
-    assert bad.selectbox[0].value == GOT
+    assert bad.selectbox[0].value is None
+    assert len(cards(bad)) == 6
 
 
 def test_skipping_the_guess_reveals_without_an_answer():
@@ -293,8 +303,8 @@ def test_the_score_only_tallies_the_hand_once_every_card_is_played():
     assert "You called 1 of 2" in done and "1 clearly declined" in done and "26 did" in done
 
 
-def test_clearing_the_search_deals_a_hand_to_play():
-    app = start()
+def test_clearing_the_search_returns_to_the_game():
+    app = start(GOT)
     app.selectbox[0].set_value(None).run()
     assert not app.exception
     assert "show" not in app.query_params
