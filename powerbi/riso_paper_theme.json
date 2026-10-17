@@ -1,0 +1,27 @@
+{
+  "name": "Diminishing Returns riso v2",
+  "dataColors": ["#E83A4C", "#0078BF", "#23212B", "#FFB511", "#8A8794", "#B8B5AA"],
+  "background": "#E9E8E2",
+  "foreground": "#23212B",
+  "tableAccent": "#E83A4C",
+  "textClasses": {
+    "callout": { "fontSize": 54, "fontFace": "Impact", "color": "#23212B" },
+    "title": { "fontSize": 22, "fontFace": "Impact", "color": "#23212B" },
+    "header": { "fontSize": 18, "fontFace": "Georgia", "color": "#23212B" },
+    "label": { "fontSize": 16, "fontFace": "Georgia", "color": "#23212B" }
+  },
+  "visualStyles": {
+    "page": {
+      "*": {
+        "background": [{ "color": { "solid": { "color": "#E9E8E2" } }, "transparency": 0 }]
+      }
+    },
+    "*": {
+      "*": {
+        "background": [{ "show": true, "color": { "solid": { "color": "#DEDCD3" } }, "transparency": 0 }],
+        "border": [{ "show": true, "color": { "solid": { "color": "#23212B" } }, "radius": 0 }],
+        "padding": [{ "top": 20, "bottom": 20, "left": 24, "right": 24 }]
+      }
+    }
+  }
+}

@@ -149,6 +149,27 @@ computes itself: every number on a show's page is one row of
 [`show_pages.sql`](sql/analysis/show_pages.sql), and a test checks that the
 3,234 rows add back up to the published findings.
 
+## The headline, as a Power BI dashboard
+
+![The Power BI dashboard: series and episode counts, the decline / rise / flat split, and the decline share by popularity tier with Wilson intervals](powerbi/dashboard.png)
+
+[`powerbi/diminishing_returns_dashboard.pbix`](powerbi/diminishing_returns_dashboard.pbix)
+puts the headline on one page: how many series and episodes are in the corpus,
+the decline / rise / flat split (16.9% / 25.7% / 57.4%), and the share of series
+that clearly decline in each popularity tier, with its Wilson 95% interval. That
+share climbs from 14.8% among the least-watched series to 43.3% among the 60
+with over 500,000 votes.
+
+It reads one file,
+[`_phase2_slopes_full.json`](data/processed/_phase2_slopes_full.json), the
+per-series slopes computed in Python. Power BI adds two calculated columns (the
+trend label and the popularity tier) and the DAX measures behind the cards,
+the chart and the table. Every number on the page matches the technical report.
+The theme is [`powerbi/riso_paper_theme.json`](powerbi/riso_paper_theme.json).
+
+To open it from a fresh clone, point the data source at your copy of the JSON
+under Transform data → Data source settings.
+
 ## Reproducing it
 
 Built with Python 3.14 on Windows. The raw IMDb dumps are not committed
@@ -205,6 +226,7 @@ docs/             the essay, the technical report, the decision log, the outline
 figures/          the nine report figures (fig01 … fig09), in three renderings
 notebooks/        one script per question, named by phase
 sql/              the build and the findings again, in SQLite
+powerbi/          the headline as a one-page Power BI dashboard, and its theme
 app/              the show-lookup app (Streamlit), live at diminishing-returns.streamlit.app
 src/build.py      raw IMDb tables -> the analysis dataset
 tests/            recomputes every published number from data/processed/
