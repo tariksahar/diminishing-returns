@@ -56,6 +56,7 @@ exclude:
   - .venv/
   - app/
   - sql/
+  - powerbi/
   - .pytest_cache/
   - data/
   - notebooks/
