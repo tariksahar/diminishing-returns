@@ -139,6 +139,14 @@ def start(show=None):
     return app.run()
 
 
+def show_param(app):
+    """The ?show= value the app wrote. AppTest reports it as a one-item list up
+    to Streamlit 1.65 and as a plain string from 1.66; the app itself always
+    reads a string, so either form is the same link."""
+    value = app.query_params["show"]
+    return value[0] if isinstance(value, list) else value
+
+
 def revealed(app):
     return 'class="riso-stamp"' in "".join(block.value for block in app.markdown)
 
@@ -207,7 +215,7 @@ def test_every_pick_sticks_and_guesses_are_kept_per_show():
     for show in [BREAKING_BAD, GOT, FRIENDS, BREAKING_BAD]:
         app.selectbox[0].set_value(show).run()
         assert app.selectbox[0].value == show
-        assert app.query_params["show"] == [show]
+        assert show_param(app) == show
         assert revealed(app) == (show == GOT)
 
 
@@ -320,7 +328,7 @@ def test_a_card_opens_its_show_unrevealed_and_is_marked_once_played():
     chosen = card_id(first)
     first.click().run()
     assert app.selectbox[0].value == chosen
-    assert app.query_params["show"] == [chosen]
+    assert show_param(app) == chosen
     assert not revealed(app)
 
     app.segmented_control[0].set_value("decline").run()
