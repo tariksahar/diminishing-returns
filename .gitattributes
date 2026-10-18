@@ -9,3 +9,4 @@
 *.pdf   binary
 *.parquet binary
 *.gz    binary
+*.pbix  binary

@@ -2,7 +2,8 @@
 
 [`LICENSE`](LICENSE) is a plain MIT licence, and it covers **the code and the
 written analysis in this repository**: everything under `src/`, `notebooks/`,
-`tests/`, the documents in `docs/`, and the figures in `figures/`.
+`tests/`, the documents in `docs/`, the figures in `figures/`, and the
+dashboard design in `powerbi/`.
 
 It does **not** cover the underlying data, which is not mine to license.
 
@@ -25,11 +26,17 @@ are derived from the IMDb dumps and **inherit IMDb's terms**: personal and
 non-commercial use. The MIT licence applies to the code that produced them, not
 to their contents.
 
+The Power BI file in `powerbi/` stores its own copy of one of those tables,
+`_phase2_slopes_full.json`, so the data inside it inherits IMDb's terms too.
+The MIT licence covers its design (the measures, the layout, the theme), not
+that data.
+
 ## In short
 
 | Thing | Licence |
 |---|---|
 | `src/`, `notebooks/`, `tests/`, `docs/`, `figures/` | MIT — use freely with attribution |
+| `powerbi/` | MIT for the design; the data stored inside the `.pbix` follows IMDb's terms |
 | `data/processed/` | IMDb's terms — personal and non-commercial use |
 | `data/raw/` (not committed) | IMDb's terms — fetch it from IMDb yourself |
 
